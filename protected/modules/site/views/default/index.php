@@ -10,6 +10,7 @@ if($userid != NULL){
     $users = Users::model()->isActive()->findAll(array('order'=>'parent_id ASC'));
 }
 
+
 $i = 1;
 foreach ($users as $key => $user) {
     if(!in_array($user->user_id, $assist)){
