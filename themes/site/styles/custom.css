@@ -1,0 +1,47 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/*
+    Created on : 26 Feb, 2015, 7:00:22 PM
+    Author     : ARK-9
+*/
+
+#main_container{
+    min-height: 400px;
+}
+a.logo, a#login_logo {
+    width: 55px;
+}
+
+/*Margin*/
+ .ml-11{ margin-left: -11px !important; }
+/*Margin*/
+
+fieldset.label_side > label {
+  width: 120px;
+}
+fieldset.label_side > div {
+    margin-left: 160px;
+}
+fieldset.label_side > label > span.required{
+    display: inline;
+}
+
+label.error,.errorMessage{
+    color: #9e253b;
+}
+input.error{
+    border: 1px solid #9e253b;
+}
+.errorMessage {
+  padding: 10px 0 0;
+}
+
+
+.align_center{
+    margin-left: auto;
+    margin-right: auto;
+    display: block !important;
+}
