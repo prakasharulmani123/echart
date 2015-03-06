@@ -31,8 +31,10 @@ class Search extends CActiveRecord {
     public $phonetical;
     public $fax;
     public $phone;
+    public $mobile;
     public $office;
     public $department;
+    public $company;
 
     /**
      * @return string the associated database table name
@@ -154,6 +156,14 @@ class Search extends CActiveRecord {
         $criteria->with = array('userProfile');
         $criteria->compare('userProfile.prof_firstname', $this->name, true);
         $criteria->compare('userProfile.prof_lastname', $this->surname, true);
+        $criteria->compare('userProfile.prof_position', $this->position, true);
+        $criteria->compare('userProfile.prof_department', $this->department, true);
+        $criteria->compare('userProfile.prof_phone', $this->phone, true);
+        $criteria->compare('userProfile.prof_mobile', $this->mobile, true);
+        $criteria->compare('userProfile.prof_fax', $this->fax, true);
+        $criteria->compare('userProfile.prof_office', $this->office, true);
+        $criteria->compare('userProfile.prof_site', $this->site, true);
+        $criteria->compare('userProfile.prof_company', $this->company, true);
         
 //        $search_conditon = "userProfile.prof_firstname = '" . $this->name . "'  "
 //                . "OR userProfile.prof_lastname = '" . $this->surname . "'  ";

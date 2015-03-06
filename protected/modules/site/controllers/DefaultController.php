@@ -2,8 +2,8 @@
 
 class DefaultController extends Controller {
 
-    public function actionIndex() {
-        $this->render('index');
+    public function actionIndex($userid = NULL) {
+        $this->render('index', array('userid' => $userid));
     }
     
     public function actionPrint() {

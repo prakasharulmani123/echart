@@ -1,7 +1,14 @@
 <?php
-$users = Users::model()->isActive()->findAll(array('order'=>'parent_id ASC'));
 $arrayUsers = array();
 $assist = explode(',', UserProfile::getAssitants());
+
+if($userid != NULL){
+    $criteria = new CDbCriteria;
+    $criteria->condition = 't.user_id = "'.$userid.'" OR t.parent_id = "'.$userid.'"';
+    $users = Users::model()->findAll($criteria);
+}else{
+    $users = Users::model()->isActive()->findAll(array('order'=>'parent_id ASC'));
+}
 
 $i = 1;
 foreach ($users as $key => $user) {
@@ -11,7 +18,7 @@ foreach ($users as $key => $user) {
             $assistant = $user->userProfile->profPersonalStaff->userProfile->prof_firstname;
         }
         $arrayUsers[$i++] = array(
-            'parent_id' => $user->parent_id,
+            'parent_id' => ($user->parent_id - $level),
             'user_id' => $user->user_id,
             'name' => $user->userProfile->prof_firstname,
             'image' => $user->user_prof_image,
@@ -38,7 +45,8 @@ if(!function_exists(createTree)){
                 $assis = $category['assistant'] == '' ? '' : '<adjunct>'. '<a href="javascript:popup('.$category['assistant_id'].')">'.$category['assistant'].'</a></adjunct>';
                 echo '<li data-username="' . $category['name'] . '" data-userid="' . $category['user_id'] . '" class="big">'.$assis.'<em>' . $category['name'] . '</em><br/>'
                 . '<a class="dialog_button" href="javascript:popup('.$category['user_id'].')" data-dialog="prof_' . $category['user_id'] . '"><img class="orgainzeImage" title="' . $category['name'] . '" src="' . Yii::app()->createAbsoluteUrl('uploads/user/'.$category['image']) . '"/></a>'
-                . '<p class="orgDept">' . $category['department'] . '</p>';
+                . '<p class="orgDept">' . $category['department'] . '</p>'
+                . '<p class="level"><a href="'.Yii::app()->createAbsoluteUrl("site/default/index?userid=".$category['user_id']). '">Move top</a></p>';
                 if ($currLevel > $prevLevel) {
                     $prevLevel = $currLevel;
                 }
@@ -273,7 +281,7 @@ if(!function_exists(createTree)){
 </script>
 <?php
 $js = <<< EOD
-    $("#organisation").orgChart({container: $("#orgChart"), interactive: true, fade: true, speed: 'slow'});
+    $("#organisation").orgChart({container: $("#orgChart")});
 //    $("#organisation").orgChart({container: $("#orgChart"), interactive: true, fade: true, speed: 'slow', nodeClicked: onNodeClicked});
     
     $(".dialog_button").on("click", function(){
