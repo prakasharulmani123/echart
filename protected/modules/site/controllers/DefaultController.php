@@ -2,8 +2,26 @@
 
 class DefaultController extends Controller {
 
-    public function actionIndex($userid = NULL) {
-        $this->render('index', array('userid' => $userid));
+    public function actionIndex() {
+        $phone = $organizaion = $manager = $staff = false;
+        $userid = '';
+        $depth = 5;
+        
+        isset($_GET['userid']) ? $userid = $_GET['userid'] : '';
+        isset($_GET['phone']) ? $phone = true : '';
+        isset($_GET['organization']) ? $organization = true : '';
+        isset($_GET['depth']) ? $depth = $_GET['depth'] : '';
+        isset($_GET['manager']) ? $manager = true : '';
+        isset($_GET['staff']) ? $staff = true : '';
+        
+        $this->render('index', array(
+            'userid' => $userid,
+            'phone' => $phone,
+            'organization' => $organization,
+            'depth' => $depth,
+            'manager' => $manager,
+            'staff' => $staff
+            ));
     }
     
     public function actionPrint() {

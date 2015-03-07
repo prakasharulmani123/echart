@@ -100,5 +100,9 @@ class Position extends CActiveRecord {
     public static function model($className = __CLASS__) {
         return parent::model($className);
     }
+    
+    public function managersList() {
+        return array('1', '3', '4');
+    }
 
 }

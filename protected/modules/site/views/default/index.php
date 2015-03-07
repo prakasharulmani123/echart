@@ -2,36 +2,55 @@
 $arrayUsers = array();
 $assist = explode(',', UserProfile::getAssitants());
 
-if($userid != NULL){
+if(isset($userid) && $userid != NULL){
     $criteria = new CDbCriteria;
     $criteria->condition = 't.user_id = "'.$userid.'" OR t.parent_id = "'.$userid.'"';
-    $users = Users::model()->isActive()->findAll($criteria);
+    $users = Users::model()->findAll($criteria);
 }else{
     $users = Users::model()->isActive()->findAll(array('order'=>'parent_id ASC'));
 }
 
+$phone == true ? $GLOBALS['phone'] = $phone : '';
+$organization == true ? $GLOBALS['organization'] = $organization : '';
+$staff == true ? $GLOBALS['staff'] = $staff : '';
+
+$managers_list = Position::model()->managersList();
 
 $i = 1;
 foreach ($users as $key => $user) {
     if(!in_array($user->user_id, $assist)){
+        if ($manager == true && !in_array($user->userProfile->profPosition->position_id, $managers_list)) {
+            continue;
+        }
         $assistant = '';
-        if($user->userProfile->prof_personal_staff != '0'){
+        $staff_count = '';
+        
+        if($staff == true){
+            $childs = Yii::app()->db->createCommand(
+                    'SELECT GetFamilyTree(user_id) as childs
+                    FROM app_users
+                    Where user_id = "'.$user->user_id.'"')->queryRow();
+                    echo '<pre>';
+                    print_r($command);
+            $child_exp = explode(',', $childs['childs']);
+            $staff_count = count($child_exp);
+        }
+        if($user->userProfile->prof_personal_staff != '0' && $manager == false){
             $assistant = $user->userProfile->profPersonalStaff->userProfile->prof_firstname;
         }
         $arrayUsers[$i++] = array(
-            'parent_id' => ($user->parent_id - $level),
+            'parent_id' => $user->parent_id,
             'user_id' => $user->user_id,
             'name' => $user->userProfile->prof_firstname,
             'image' => $user->user_prof_image,
             'department' => $user->userProfile->profDepartment->dept_name,
             'assistant_id' => $user->userProfile->prof_personal_staff,
-            'assistant' => $assistant
+            'assistant' => $assistant,
+            'phone' => $user->userProfile->prof_phone,
+            'staff' => $staff_count,
         );
     }
 }
-//echo '<pre>';
-//print_r($arrayUsers);
-//exit;
 
 if(!function_exists(createTree)){
     function createTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $topParent) {
@@ -44,13 +63,23 @@ if(!function_exists(createTree)){
                         echo '<ul>';
                     }
                 }
-                if ($currLevel == $prevLevel)
+                if ($currLevel <= $prevLevel)
                     echo '</li>';
                 $assis = $category['assistant'] == '' ? '' : '<adjunct>'. '<a href="javascript:popup('.$category['assistant_id'].')">'.$category['assistant'].'</a></adjunct>';
-                echo '<li data-username="' . $category['name'] . '" data-userid="' . $category['user_id'] . '" class="big">'.$assis.'<em>' . $category['name'] . '</em><br/>'
-                . '<a class="dialog_button" href="javascript:popup('.$category['user_id'].')" data-dialog="prof_' . $category['user_id'] . '"><img class="orgainzeImage" title="' . $category['name'] . '" src="' . Yii::app()->createAbsoluteUrl('uploads/user/'.$category['image']) . '"/></a>'
-                . '<p class="orgDept">' . $category['department'] . '</p>'
-                . '<p class="level"><a href="'.Yii::app()->createAbsoluteUrl("site/default/index?userid=".$category['user_id']). '">Move top</a></p>';
+                $content = '';
+                if(!isset($GLOBALS['organization'])){
+                    $content .= $assis.'<em>' . $category['name'] . '</em><br/>';
+                }
+                $content .= '<a class="dialog_button" href="javascript:popup('.$category['user_id'].')" data-dialog="prof_' . $category['user_id'] . '"><img class="orgainzeImage" title="' . $category['name'] . '" src="' . Yii::app()->createAbsoluteUrl('uploads/user/'.$category['image']) . '"/></a>';
+                $content .= '<p class="orgDept">' . $category['department'] . '</p>';
+                if(isset($GLOBALS['staff'])){
+                    $content .= $category['staff'];
+                }
+                if(isset($GLOBALS['phone'])){
+                    $content .= '<p class="orgDept">' . $category['phone'] . '</p>';
+                }
+//                $content .= '<p class="level"><a href="'.Yii::app()->createAbsoluteUrl("site/default/index?userid=".$category['user_id']). '">Move top</a></p>';
+                echo '<li data-username="' . $category['name'] . '" data-userid="' . $category['user_id'] . '" class="big">'.$content;
                 if ($currLevel > $prevLevel) {
                     $prevLevel = $currLevel;
                 }
@@ -285,7 +314,7 @@ if(!function_exists(createTree)){
 </script>
 <?php
 $js = <<< EOD
-    $("#organisation").orgChart({container: $("#orgChart")});
+    $("#organisation").orgChart({container: $("#orgChart"), depth: $depth});
 //    $("#organisation").orgChart({container: $("#orgChart"), interactive: true, fade: true, speed: 'slow', nodeClicked: onNodeClicked});
     
     $(".dialog_button").on("click", function(){
@@ -294,7 +323,6 @@ $js = <<< EOD
     function onNodeClicked(_node) {
         $("#a_prof_"+_node.data("userid")).trigger("click");
     }
-        
 EOD;
 
 Yii::app()->clientScript->coreScriptPosition = CClientScript::POS_END;
@@ -305,4 +333,10 @@ Yii::app()->clientScript->registerScript('organisation', $js);
     .ui-tabs-hide{
         display: none !important;
     }
+    
+    <?php if($phone == true){?>
+        div.orgChart div.node.big {
+            height: auto;
+        }
+    <?php } ?>
 </style>

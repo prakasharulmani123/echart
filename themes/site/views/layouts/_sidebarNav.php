@@ -18,20 +18,20 @@
                         'itemOptions' => array('class' => 'sub-menu'),
                         'submenuOptions' => array('class' => 'drawer'),
                         'items' => array(
-                            array('label' => '<span>Organization Chart</span>', 'url' => '#'),
-                            array('label' => '<span>Manager</span>', 'url' => '#'),
-                            array('label' => '<span>Organization</span>', 'url' => '#'),
-                            array('label' => '<span>Staff</span>', 'url' => '#'),
-                            array('label' => '<span>Phones</span>', 'url' => '#')
+                            array('label' => '<span>Organization Chart</span>', 'url' => Yii::app()->createAbsoluteUrl('site/default/index')),
+                            array('label' => '<span>Manager</span>', 'url' => Yii::app()->createAbsoluteUrl('site/default/index?manager=true')),
+                            array('label' => '<span>Organization</span>', 'url' => Yii::app()->createAbsoluteUrl('site/default/index?organization=true')),
+                            array('label' => '<span>Staff</span>', 'url' => Yii::app()->createAbsoluteUrl('site/default/index?staff=true')),
+                            array('label' => '<span>Phones</span>', 'url' => Yii::app()->createAbsoluteUrl('site/default/index?phone=true'))
                         )),
                     array('label' => '<span>Styles</span>', 'url' => '#'),
                     array('label' => '<span>Levels</span>', 'url' => '#',
                         'itemOptions' => array('class' => 'sub-menu'),
                         'submenuOptions' => array('class' => 'drawer'),
                         'items' => array(
-                            array('label' => '<span>3 Levels</span>', 'url' => '#'),
-                            array('label' => '<span>4 Levels</span>', 'url' => '#'),
-                            array('label' => '<span>5 Levels</span>', 'url' => '#'),
+                            array('label' => '<span>3 Levels</span>', 'url' => Yii::app()->createAbsoluteUrl('site/default/index?depth=3')),
+                            array('label' => '<span>4 Levels</span>', 'url' => Yii::app()->createAbsoluteUrl('site/default/index?depth=4')),
+                            array('label' => '<span>5 Levels</span>', 'url' => Yii::app()->createAbsoluteUrl('site/default/index?depth=5')),
                         )),
                 )),
         ),
