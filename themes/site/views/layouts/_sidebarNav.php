@@ -6,10 +6,10 @@
         'encodeLabel' => false,
         'items' => array(
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/laptop.png") . '<span class="display_none">Home</span>', 'url' => '#', 'itemOptions' => array('class' => 'icon_only')),
-            array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Find</span>', 'url' => Yii::app()->createAbsoluteUrl('site/users/find')),
-            array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Print</span>', 'url' => '#'),
+            array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Find</span>', 'url' => $this->createUrl('/site/users/find')),
+            array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Print</span>', 'url' => $this->createUrl('/site/arivu/print')),
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Go to structure</span>', 'url' => '#'),
-            array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Explore Structure</span>', 'url' => Yii::app()->createAbsoluteUrl('site/users/explore')),
+            array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Explore Structure</span>', 'url' => $this->createUrl('/site/users/explore')),
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Options</span>', 'url' => '#',
                 'itemOptions' => array('class' => 'sub-menu'),
                 'submenuOptions' => array('class' => 'sub'),
@@ -44,7 +44,6 @@
             'htmlOptions' => array('class' => 'send_right'),
             'encodeLabel' => false,
             'items' => array(
-//            array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/laptop.png").'<span class="display_none">Users</span>', 'url' => '#','itemOptions'=>array('class'=>'icon_only')),
                 array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Users</span>', 'url' => array('/admin/user/index')),
                 array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Departments</span>', 'url' => array('/admin/department/index')),
                 array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Positions</span>', 'url' => array('/admin/position/index')),
