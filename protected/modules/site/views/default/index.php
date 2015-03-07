@@ -5,7 +5,7 @@ $assist = explode(',', UserProfile::getAssitants());
 if($userid != NULL){
     $criteria = new CDbCriteria;
     $criteria->condition = 't.user_id = "'.$userid.'" OR t.parent_id = "'.$userid.'"';
-    $users = Users::model()->findAll($criteria);
+    $users = Users::model()->isActive()->findAll($criteria);
 }else{
     $users = Users::model()->isActive()->findAll(array('order'=>'parent_id ASC'));
 }
@@ -29,6 +29,9 @@ foreach ($users as $key => $user) {
         );
     }
 }
+//echo '<pre>';
+//print_r($arrayUsers);
+//exit;
 
 if(!function_exists(createTree)){
     function createTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $topParent) {
@@ -291,6 +294,7 @@ $js = <<< EOD
     function onNodeClicked(_node) {
         $("#a_prof_"+_node.data("userid")).trigger("click");
     }
+        
 EOD;
 
 Yii::app()->clientScript->coreScriptPosition = CClientScript::POS_END;
