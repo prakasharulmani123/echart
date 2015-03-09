@@ -3,16 +3,8 @@
 class DefaultController extends Controller {
 
     public function actionIndex() {
-        $phone = $organizaion = $manager = $staff = false;
-        $userid = '';
-        $depth = 5;
-        
-        isset($_GET['userid']) ? $userid = $_GET['userid'] : '';
-        isset($_GET['phone']) ? $phone = true : '';
-        isset($_GET['organization']) ? $organization = true : '';
-        isset($_GET['depth']) ? $depth = $_GET['depth'] : '';
-        isset($_GET['manager']) ? $manager = true : '';
-        isset($_GET['staff']) ? $staff = true : '';
+        $userid = isset($_GET['userid']) ? $_GET['userid'] : '1';
+        $depth = isset($_GET['depth']) ? $_GET['depth'] : 5;
         
         $this->render('index', array(
             'userid' => $userid,

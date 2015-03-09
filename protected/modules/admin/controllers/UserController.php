@@ -125,10 +125,6 @@ class UserController extends Controller {
         if (empty($user))
             throw new CHttpException(404, 'The requested page does not exist.');
 
-//        $user->setAttribute('user_status', '2');
-//        if($user->save()){
-        Diary::model()->deleteAll("diary_user_id = $id");
-        Entry::model()->deleteAll("temp_activation_key = '$user->user_activation_key'");
         $user->delete();
         Yii::app()->user->setFlash('success', 'You have deleted successfully');
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser

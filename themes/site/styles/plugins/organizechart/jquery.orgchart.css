@@ -108,7 +108,7 @@ div.orgChart div.node.big {
 height: 65px;
 width: 185px;
 }
-div.orgChart div.node.big img {
+div.orgChart div.node.big .orgainzeImage {
     border: 2px solid black;
     border-radius: 4px;
 }

@@ -38,7 +38,8 @@ class Users extends CActiveRecord {
         return array(
             'isActive' => array('condition' => "$alias.user_status = '1'"),
             'isParent' => array('condition' => "$alias.parent_id = '0'"),
-            'notSelf' => array('condition' => "$alias.user_id = '".Yii::app()->user->id."'"),
+            'isNotAssistnant' => array('condition' => "$alias.is_personal_staff <> '1'"),
+            'notSelf' => array('condition' => "$alias.user_id = '" . Yii::app()->user->id . "'"),
         );
     }
 
@@ -91,8 +92,66 @@ class Users extends CActiveRecord {
         // NOTE: you may need to adjust the relation name and the related
         // class name for the relations automatically generated below.
         return array(
-            'userProfile' => array(self::HAS_ONE, 'UserProfile', 'user_id')
+            'userProfile' => array(self::HAS_ONE, 'UserProfile', 'user_id'),
+            'parent' => array(self::BELONGS_TO, 'Users', 'parent_id'),
+            'children' => array(self::HAS_MANY, 'Users', 'parent_id', 'order' => 'user_name', 'condition' => "is_personal_staff <> '1'"),
+            'childCount' => array(self::STAT, 'Users', 'parent_id'),
         );
+    }
+
+    public function behaviors() {
+        return array(
+            'TreeBehavior' => array(
+                'class' => 'ext.behaviors.XTreeBehavior',
+                'treeLabelMethod' => 'getTreeLabel',
+//                'menuUrlMethod' => 'getMenuUrl',
+            ),
+        );
+    }
+
+    public function getTreeLabel() {
+        $label = '';
+        $label .= '<span id="orgainzeImage'.$this->user_id.'">';
+        if (!isset($_GET['organization'])) {
+            $label .= '<em>' . $this->userProfile->prof_firstname . '</em><br>';
+        }
+        $label .= '<a class="dialog_button" data-dialog="prof_' . $this->user_id . '" href="javascript:popup(' . $this->user_id . ')">
+    <img class="orgainzeImage" src="' . Yii::app()->createAbsoluteUrl('uploads/user/' . $this->user_prof_image) . '" title="' . $this->user_name . '" />
+    </a>';
+        
+        $label .= '</span>';
+        
+        if (isset($_GET['phone']) && $_GET['phone'] == true) {
+            $label .= '<p class="orgDept">' . $this->userProfile->prof_phone . '</p>';
+        }
+        $label .= '<p class="orgDept">' . $this->userProfile->profDepartment->dept_name . '</p>';
+
+        if (isset($_GET['staff']) && $_GET['staff'] == true) {
+            $childs = Yii::app()->db->createCommand(
+                            'SELECT GetFamilyTree(user_id) as childs
+                    FROM app_users
+                    Where user_id = "' . $this->user_id . '"')->queryRow();
+            if($childs['childs'] == ''){
+                $staff_count = '';
+            }else{
+                $child_exp = explode(',', $childs['childs']);
+                $staff_count = count($child_exp);
+            }
+            $label .= '<p class="orgDept">' . $staff_count . '</p>';
+        }
+        
+        $move_img = CHtml::link(
+                CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/navidown.gif')),
+                Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->user_id), array('title' => 'Down in hierarchy'));
+        if (isset($_GET['userid']) && $_GET['userid'] != '') {
+            if($_GET['userid'] == $this->user_id){
+                $move_img = CHtml::link(
+                        CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/naviup.gif')),
+                        Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->parent_id), array('title' => 'Up in hierarchy'));
+            }
+        }
+        $label .= '<p class="orgDept">'.$move_img. '</p>';
+        return $label;
     }
 
     /**

@@ -31,6 +31,12 @@
         $cs->registerCssFile($this->themeUrl . '/styles/plugins/organizechart/jquery.orgchart.css');
         
         $cs->registerCssFile($this->themeUrl . '/styles/plugins/treeview/jquery.treeview.css');
+        
+        $cs->registerCssFile($this->themeUrl . '/styles/plugins/tooltip/tooltipster.css');
+        $cs->registerCssFile($this->themeUrl . '/styles/plugins/tooltip/themes/tooltipster-light.css');
+        $cs->registerCssFile($this->themeUrl . '/styles/plugins/tooltip/themes/tooltipster-noir.css');
+        $cs->registerCssFile($this->themeUrl . '/styles/plugins/tooltip/themes/tooltipster-punk.css');
+        $cs->registerCssFile($this->themeUrl . '/styles/plugins/tooltip/themes/tooltipster-shadow.css');
         ?>
     </head>
     <body>
@@ -68,6 +74,8 @@
         
         $cs->registerScriptFile($this->themeUrl . '/scripts/treeview/jquery.treeview.js', $cs_pos_end);
         $cs->registerScriptFile($this->themeUrl . '/scripts/treeview/treeconfig.js', $cs_pos_end);
+        
+        $cs->registerScriptFile($this->themeUrl . '/scripts/tooltip/jquery.tooltipster.min.js', $cs_pos_end);
 
 //        $cs->registerScriptFile($this->themeUrl . '/scripts/jquery/jqueryui.js', $cs_pos_end);
 //

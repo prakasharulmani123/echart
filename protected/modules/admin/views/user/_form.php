@@ -34,13 +34,13 @@ $form = $this->beginWidget('CActiveForm', array(
 
 <div class="columns clearfix">
     <div class="col_50">
-        <!--        <fieldset class="label_side top">
+                <fieldset class="label_side top">
         <?php echo $form->labelEx($model, 'is_personal_staff'); ?>
                     <div class="clearfix">
         <?php echo $form->dropDownList($model, 'is_personal_staff', Myclass::getPersonalStaffStatus(), array('class' => 'uniform')); ?>
         <?php echo $form->error($model, 'is_personal_staff'); ?>
                     </div>
-                </fieldset>-->
+                </fieldset>
 
         <fieldset class="label_side top">
             <?php echo $form->labelEx($model, 'parent_id'); ?>
@@ -242,18 +242,18 @@ $form = $this->beginWidget('CActiveForm', array(
 <?php $this->endWidget(); ?>
 
 <?php
-//$js = <<< EOD
-//        $(document).ready(function(){
-//            $("#Users_is_personal_staff").on("change", function(){
-//                if($(this).val() == '0'){
-//                    $("#personal_staff_field").show();
-//                }else{
-//                    $("#personal_staff_field").hide();
-//                }
-//            });
-//        });
-//EOD;
-//
-//Yii::app()->clientScript->coreScriptPosition = CClientScript::POS_END;
-//Yii::app()->clientScript->registerScript('_form', $js);
+$js = <<< EOD
+        $(document).ready(function(){
+            $("#Users_is_personal_staff").on("change", function(){
+                if($(this).val() == '0'){
+                    $("#personal_staff_field").show();
+                }else{
+                    $("#personal_staff_field").hide();
+                }
+            });
+        });
+EOD;
+
+Yii::app()->clientScript->coreScriptPosition = CClientScript::POS_END;
+Yii::app()->clientScript->registerScript('_form', $js);
 ?>

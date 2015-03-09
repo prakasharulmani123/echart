@@ -1,102 +1,43 @@
 <?php
-$arrayUsers = array();
-$assist = explode(',', UserProfile::getAssitants());
-
-if(isset($userid) && $userid != NULL){
-    $criteria = new CDbCriteria;
-    $criteria->condition = 't.user_id = "'.$userid.'" OR t.parent_id = "'.$userid.'"';
-    $users = Users::model()->findAll($criteria);
-}else{
-    $users = Users::model()->isActive()->findAll(array('order'=>'parent_id ASC'));
-}
-
-$phone == true ? $GLOBALS['phone'] = $phone : '';
-$organization == true ? $GLOBALS['organization'] = $organization : '';
-$staff == true ? $GLOBALS['staff'] = $staff : '';
-
-$managers_list = Position::model()->managersList();
-
-$i = 1;
-foreach ($users as $key => $user) {
-    if(!in_array($user->user_id, $assist)){
-        if ($manager == true && !in_array($user->userProfile->profPosition->position_id, $managers_list)) {
-            continue;
-        }
-        $assistant = '';
-        $staff_count = '';
-        
-        if($staff == true){
-            $childs = Yii::app()->db->createCommand(
-                    'SELECT GetFamilyTree(user_id) as childs
-                    FROM app_users
-                    Where user_id = "'.$user->user_id.'"')->queryRow();
-                    echo '<pre>';
-                    print_r($command);
-            $child_exp = explode(',', $childs['childs']);
-            $staff_count = count($child_exp);
-        }
-        if($user->userProfile->prof_personal_staff != '0' && $manager == false){
-            $assistant = $user->userProfile->profPersonalStaff->userProfile->prof_firstname;
-        }
-        $arrayUsers[$i++] = array(
-            'parent_id' => $user->parent_id,
-            'user_id' => $user->user_id,
-            'name' => $user->userProfile->prof_firstname,
-            'image' => $user->user_prof_image,
-            'department' => $user->userProfile->profDepartment->dept_name,
-            'assistant_id' => $user->userProfile->prof_personal_staff,
-            'assistant' => $assistant,
-            'phone' => $user->userProfile->prof_phone,
-            'staff' => $staff_count,
-        );
-    }
-}
-
-if(!function_exists(createTree)){
-    function createTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $topParent) {
-        foreach ($array as $categoryId => $category) {
-            if ($currentParent == $category['parent_id']) {
-                if ($currLevel > $prevLevel) {
-                    if ($topParent == 0) {
-                        echo '<ul id="organisation" class="display_none">';
-                    } else {
-                        echo '<ul>';
-                    }
-                }
-                if ($currLevel <= $prevLevel)
-                    echo '</li>';
-                $assis = $category['assistant'] == '' ? '' : '<adjunct>'. '<a href="javascript:popup('.$category['assistant_id'].')">'.$category['assistant'].'</a></adjunct>';
-                $content = '';
-                if(!isset($GLOBALS['organization'])){
-                    $content .= $assis.'<em>' . $category['name'] . '</em><br/>';
-                }
-                $content .= '<a class="dialog_button" href="javascript:popup('.$category['user_id'].')" data-dialog="prof_' . $category['user_id'] . '"><img class="orgainzeImage" title="' . $category['name'] . '" src="' . Yii::app()->createAbsoluteUrl('uploads/user/'.$category['image']) . '"/></a>';
-                $content .= '<p class="orgDept">' . $category['department'] . '</p>';
-                if(isset($GLOBALS['staff'])){
-                    $content .= $category['staff'];
-                }
-                if(isset($GLOBALS['phone'])){
-                    $content .= '<p class="orgDept">' . $category['phone'] . '</p>';
-                }
-//                $content .= '<p class="level"><a href="'.Yii::app()->createAbsoluteUrl("site/default/index?userid=".$category['user_id']). '">Move top</a></p>';
-                echo '<li data-username="' . $category['name'] . '" data-userid="' . $category['user_id'] . '" class="big">'.$content;
-                if ($currLevel > $prevLevel) {
-                    $prevLevel = $currLevel;
-                }
-                $currLevel++;
-                createTree($array, $categoryId, $currLevel, $prevLevel, 1);
-                $currLevel--;
-            }
-        }
-        if ($currLevel == $prevLevel)
-            echo ' </li>  </ul> ';
-    }
-}
+$users = Users::model()->isActive()->findAll(array('order' => 'parent_id ASC'));
 ?>
 <div class="flat_area grid_16">
-    <?php createTree($arrayUsers, 0, 0, -1, 0); ?>
+    <div class="display_none">
+        <?php
+        $this->widget('CTreeView', array(
+            'id' => 'organisation',
+            'data' => Users::model()->getTreeItems($userid, true),
+            'control' => '#treecontrol',
+            'animated' => 'fast',
+            'collapsed' => true,
+            'htmlOptions' => array(
+                'class' => 'filetree',
+            )
+        ));
+        ?>
+    </div>
     <div id="orgChart"></div>
 </div>
+<script type="text/javascript">
+    function popup(value) {
+        $("#a_prof_" + value).trigger("click");
+    }
+</script>
+<?php
+$js = <<< EOD
+    $("#organisation").orgChart({container: $("#orgChart"), depth: $depth});
+//    $("#organisation").orgChart({container: $("#orgChart"), interactive: true, fade: true, speed: 'slow', nodeClicked: onNodeClicked});
+    
+    $(".dialog_button").on("click", function(){
+        $("#a_prof_"+$(this).data("dialog")).trigger("click");
+    });
+    function onNodeClicked(_node) {
+        $("#a_prof_"+_node.data("userid")).trigger("click");
+    }
+    $(".node").addClass("big");
+    $(".adjunct").removeClass("big");
+EOD;
+?>
 
 <?php foreach ($users as $key => $user) { ?>
     <div class="display_none">
@@ -113,18 +54,15 @@ if(!function_exists(createTree)){
                         <div class="columns clearfix">
                             <div class="col_25">
                                 <div class="section">
-                                    <?=
-                                    CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/'.$user->user_prof_image), 
-                                            $user->user_name, 
-                                            array('width' => '55', 'id' => 'contactImage'))
+                                    <?= CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), $user->user_name, array('width' => '55', 'id' => 'contactImage'))
                                     ?>
                                 </div>
                             </div>
                             <div class="col_75">
                                 <div class="section">
-                                    <h2 id="contactName"><?= $user->userProfile->prof_firstname ?></h2>
-                                    <h3 id="contactEmail"><?= $user->userProfile->profPosition->position_name ?></h3>
-                                    <h3><?= $user->userProfile->profDepartment->dept_name ?></h3>
+                                    <h2 id="contactName"><?php echo $firstname = $user->userProfile->prof_firstname ?></h2>
+                                    <h3 id="contactEmail"><?php echo $position = $user->userProfile->profPosition->position_name ?></h3>
+                                    <h3><?php echo $dept =  $user->userProfile->profDepartment->dept_name ?></h3>
                                 </div>
                             </div>
                         </div>
@@ -133,7 +71,7 @@ if(!function_exists(createTree)){
                                 <fieldset class="label_side top">
                                     <label><?= UserProfile::model()->getAttributeLabel('prof_phone') ?></label>
                                     <div>
-                                        <p><?= $user->userProfile->prof_phone ?></p>
+                                        <p><?php echo $phone =  $user->userProfile->prof_phone ?></p>
                                     </div>
                                 </fieldset>
 
@@ -185,7 +123,7 @@ if(!function_exists(createTree)){
 
                     </div>
                     <div id="tabs-2" class="block">
-                        
+
                         <div class="columns clearfix">
                             <div class="col_100">
                                 <fieldset class="label_side top">
@@ -236,7 +174,7 @@ if(!function_exists(createTree)){
 
                     </div>
                     <div id="tabs-3" class="block">
-                        
+
                         <div class="columns clearfix">
                             <div class="col_100">
                                 <fieldset class="label_side top">
@@ -245,42 +183,42 @@ if(!function_exists(createTree)){
                                         <p><?= $user->userProfile->profSite->site_name ?></p>
                                     </div>
                                 </fieldset>
-                                
+
                                 <fieldset class="label_side top">
                                     <label><?= Site::model()->getAttributeLabel('reception_mail') ?></label>
                                     <div>
                                         <p><?= $user->userProfile->profSite->reception_mail ?></p>
                                     </div>
                                 </fieldset>
-                                
+
                                 <fieldset class="label_side top">
                                     <label><?= Site::model()->getAttributeLabel('reception_phone') ?></label>
                                     <div>
                                         <p><?= $user->userProfile->profSite->reception_phone ?></p>
                                     </div>
                                 </fieldset>
-                                
+
                                 <fieldset class="label_side top">
                                     <label><?= Site::model()->getAttributeLabel('parking_phone') ?></label>
                                     <div>
                                         <p><?= $user->userProfile->profSite->parking_phone ?></p>
                                     </div>
                                 </fieldset>
-                                
+
                                 <fieldset class="label_side top">
                                     <label><?= Site::model()->getAttributeLabel('tel_security') ?></label>
                                     <div>
                                         <p><?= $user->userProfile->profSite->tel_security ?></p>
                                     </div>
                                 </fieldset>
-                                
+
                                 <fieldset class="label_side top">
                                     <label><?= Site::model()->getAttributeLabel('address') ?></label>
                                     <div>
                                         <p><?= $user->userProfile->profSite->address ?></p>
                                     </div>
                                 </fieldset>
-                                
+
                                 <fieldset class="label_side top">
                                     <label><?= Site::model()->getAttributeLabel('restaurant') ?></label>
                                     <div>
@@ -304,27 +242,20 @@ if(!function_exists(createTree)){
         </div>
     </div>
     </div>
-    <?php
-}
-?>
-<script type="text/javascript">
-    function popup(value){
-        $("#a_prof_"+value).trigger("click");
-    }
-</script>
 <?php
-$js = <<< EOD
-    $("#organisation").orgChart({container: $("#orgChart"), depth: $depth});
-//    $("#organisation").orgChart({container: $("#orgChart"), interactive: true, fade: true, speed: 'slow', nodeClicked: onNodeClicked});
-    
-    $(".dialog_button").on("click", function(){
-        $("#a_prof_"+$(this).data("dialog")).trigger("click");
+$img = CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), '',array('width'=>'50', 'height' => '50'));
+$js .= <<< EOD
+    $('h2 #orgainzeImage$user->user_id').tooltipster({
+            content: $('$img<p style="text-align:center;">$firstname</p><p style="text-align:center;">$position</p><p style="text-align:center">$dept</p><p style="text-align:center">$phone</p>'),
+            // setting a same value to minWidth and maxWidth will result in a fixed width
+            minWidth: 150,
+            maxWidth: 150,
+            position: 'right',
+            theme: 'tooltipster-light'
     });
-    function onNodeClicked(_node) {
-        $("#a_prof_"+_node.data("userid")).trigger("click");
-    }
+    
 EOD;
-
+}
 Yii::app()->clientScript->coreScriptPosition = CClientScript::POS_END;
 Yii::app()->clientScript->registerScript('organisation', $js);
 ?>
@@ -333,10 +264,10 @@ Yii::app()->clientScript->registerScript('organisation', $js);
     .ui-tabs-hide{
         display: none !important;
     }
-    
-    <?php if($phone == true){?>
+
+<?php if ($phone == true) { ?>
         div.orgChart div.node.big {
             height: auto;
         }
-    <?php } ?>
+<?php } ?>
 </style>
