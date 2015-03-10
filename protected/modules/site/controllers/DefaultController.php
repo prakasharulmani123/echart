@@ -17,43 +17,48 @@ class DefaultController extends Controller {
     }
     
     public function actionPrint() {
-        $rend = $this->renderPartial('print', array(), true, true);
-        echo '<pre>';
-        print_r($rend);
+//        $rend = $this->renderPartial('print', array(), true, true);
+        $this->renderPartial('print', array(), false, true);
     }
     
     public function actionDownload() {
-        $mPDF1 = Yii::app()->ePdf->mpdf();
+        require 'pdfcrowd/pdfcrowd.php';
+        $client = new Pdfcrowd("prakasharulmani", "716b089f7ec811d7cec8156f399dd472");
+        // convert a web page and store the generated PDF into a $pdf variable
+        $pdf = $client->convertURI(Yii::app()->createAbsoluteUrl('site/default/print'));
+
+        $date = strtotime(date('Y-m-d h:i:s'));
+        // set HTTP response headers
+        header("Content-Type: application/pdf");
+        header("Cache-Control: max-age=0");
+        header("Accept-Ranges: none");
+        header("Content-Disposition: attachment; filename=\"chart_{$date}.pdf\"");
+
+        // send the generated PDF 
+        echo $pdf;
+        exit;
+        $mPDF1 = Yii::app()->ePdf->HTML2PDF();
 
         # Load a stylesheet
-//        $stylesheet1 = file_get_contents( Yii::getPathOfAlias('webroot.css').'/styles/adminica/reset.css');
-//        $stylesheet2 = file_get_contents( Yii::getPathOfAlias('webroot.css').'/styles/plugins/all/plugins.css');
-//        $stylesheet3 = file_get_contents( Yii::getPathOfAlias('webroot.css').'/styles/adminica/all.css');
-//        $stylesheet4 = file_get_contents( Yii::getPathOfAlias('webroot.css').'/styles/themes/switcher.css');
-//        $stylesheet5 = file_get_contents( Yii::getPathOfAlias('webroot.css').'/styles/themes/nav_top.css');
-//        $stylesheet6 = file_get_contents( Yii::getPathOfAlias('webroot.css').'/styles/themes/theme_blue.css');
-//        $stylesheet7 = file_get_contents( Yii::getPathOfAlias('webroot.css').'/styles/adminica/colours.css');
-//        $stylesheet8 = file_get_contents( Yii::getPathOfAlias('webroot.css').'/styles/custom.css');
-//        $stylesheet9 = file_get_contents( Yii::getPathOfAlias('webroot.css').'/styles/plugins/organizechart/jquery.orgchart.css');
-//        $stylesheet10 = file_get_contents( Yii::getPathOfAlias('webroot.css').'/styles/plugins/treeview/jquery.treeview.css');
-//        $mPDF1->WriteHTML($stylesheet1, 1);
-//        $mPDF1->WriteHTML($stylesheet2, 2);
-//        $mPDF1->WriteHTML($stylesheet3, 3);
-//        $mPDF1->WriteHTML($stylesheet4, 4);
-//        $mPDF1->WriteHTML($stylesheet5, 5);
-//        $mPDF1->WriteHTML($stylesheet6, 6);
-//        $mPDF1->WriteHTML($stylesheet7, 7);
-//        $mPDF1->WriteHTML($stylesheet8, 8);
-//        $mPDF1->WriteHTML($stylesheet9, 9);
-//        $mPDF1->WriteHTML($stylesheet10, 10);
-        $rend = $this->renderPartial('print', array(), true, true);
-        $mPDF1->WriteHTML($rend);
-
+//        $stylesheet = file_get_contents(Yii::app()->createAbsoluteUrl('themes/site/styles/adminica/reset.css'));
+//        $stylesheet .= file_get_contents(Yii::app()->createAbsoluteUrl('themes/site/styles/plugins/all/plugins.css'));
+//        $stylesheet .= file_get_contents(Yii::app()->createAbsoluteUrl('themes/site/styles/adminica/all.css'));
+//        $stylesheet .= file_get_contents(Yii::app()->createAbsoluteUrl('themes/site/styles/themes/switcher.css'));
+//        $stylesheet .= file_get_contents(Yii::app()->createAbsoluteUrl('themes/site/styles/themes/nav_top.css'));
+//        $stylesheet .= file_get_contents(Yii::app()->createAbsoluteUrl('themes/site/styles/adminica/colours.css'));
+//        $stylesheet .= file_get_contents(Yii::app()->createAbsoluteUrl('themes/site/styles/custom.css'));
+//        $stylesheet .= file_get_contents(Yii::app()->createAbsoluteUrl('themes/site/styles/plugins/organizechart/jquery.orgchart.css'));
+//        $stylesheet .= file_get_contents(Yii::app()->createAbsoluteUrl('themes/site/styles/plugins/treeview/jquery.treeview.css'));
+//        $mPDF1->WriteHTML($stylesheet, 1);
+        $render = $this->renderPartial('print', array(), true, true);
+//        echo ($render); exit;
+        $mPDF1->WriteHTML($render);
+//print $render;
+//        exit;
         # Renders image
 //        $mPDF1->WriteHTML(CHtml::image(Yii::getPathOfAlias('webroot.css') . '/bg.gif' ));
-
         # Outputs ready PDF
-        $mPDF1->Output();
+        $mPDF1->Output('doc.pdf','I');
     }
 
     public function actionUnderdevelopment() {
