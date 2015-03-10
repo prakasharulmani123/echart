@@ -6,7 +6,7 @@ $users = Users::model()->isActive()->findAll(array('order' => 'parent_id ASC'));
         <?php
         $this->widget('CTreeView', array(
             'id' => 'organisation',
-            'data' => Users::model()->getTreeItems($userid, true),
+            'data' => Users::model()->getTreeItems($userid, true, true),
             'control' => '#treecontrol',
             'animated' => 'fast',
             'collapsed' => true,
@@ -54,7 +54,7 @@ EOD;
                         <div class="columns clearfix">
                             <div class="col_25">
                                 <div class="section">
-                                    <?= CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), $user->user_name, array('width' => '55', 'id' => 'contactImage'))
+                                    <?= CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), $user->user_name, array('width' => '55'))
                                     ?>
                                 </div>
                             </div>
@@ -62,7 +62,7 @@ EOD;
                                 <div class="section">
                                     <h2 id="contactName"><?php echo $firstname = $user->userProfile->prof_firstname ?></h2>
                                     <h3 id="contactEmail"><?php echo $position = $user->userProfile->profPosition->position_name ?></h3>
-                                    <h3><?php echo $dept =  $user->userProfile->profDepartment->dept_name ?></h3>
+                                    <h3><?php echo $dept = $user->userProfile->profDepartment->dept_name ?></h3>
                                 </div>
                             </div>
                         </div>
@@ -71,7 +71,7 @@ EOD;
                                 <fieldset class="label_side top">
                                     <label><?= UserProfile::model()->getAttributeLabel('prof_phone') ?></label>
                                     <div>
-                                        <p><?php echo $phone =  $user->userProfile->prof_phone ?></p>
+                                        <p><?php echo $phone = $user->userProfile->prof_phone ?></p>
                                     </div>
                                 </fieldset>
 
@@ -243,13 +243,13 @@ EOD;
     </div>
     </div>
 <?php
-$img = CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), '',array('width'=>'50', 'height' => '50'));
+$img = CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), '',array('width'=>'50', 'height' => '50', 'style' => 'margin-left:70px;'));
 $js .= <<< EOD
     $('h2 #orgainzeImage$user->user_id').tooltipster({
-            content: $('$img<p style="text-align:center;">$firstname</p><p style="text-align:center;">$position</p><p style="text-align:center">$dept</p><p style="text-align:center">$phone</p>'),
+            content: $('$img<p style="text-align:center;"><b>$firstname</b></p><br /><p style="text-align:center;">$position</p><p style="text-align:center">$dept</p><p style="text-align:center">$phone</p>'),
             // setting a same value to minWidth and maxWidth will result in a fixed width
-            minWidth: 150,
-            maxWidth: 150,
+            minWidth: 200,
+            maxWidth: 200,
             position: 'right',
             theme: 'tooltipster-light'
     });
@@ -265,7 +265,7 @@ Yii::app()->clientScript->registerScript('organisation', $js);
         display: none !important;
     }
 
-<?php if ($phone == true) { ?>
+<?php if (isset($_GET['phone'])) { ?>
         div.orgChart div.node.big {
             height: auto;
         }

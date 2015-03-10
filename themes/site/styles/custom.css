@@ -45,3 +45,11 @@ input.error{
     margin-right: auto;
     display: block !important;
 }
+
+#structure{
+    padding: 16px;
+}
+
+#browser {
+  width: 25%;
+}

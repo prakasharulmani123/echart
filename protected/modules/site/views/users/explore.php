@@ -1,5 +1,5 @@
 <?php
-$dist_parents = Users::model()->isActive()->findAll(array('select'=>'t.parent_id','distinct'=>true, 'order' => 't.parent_id asc'));
+$dist_parents = Users::model()->isActive()->findAll(array('select' => 't.parent_id', 'distinct' => true, 'order' => 't.parent_id asc'));
 $users = Users::model()->isActive()->findAll();
 $arrayUsers = array();
 $assist = explode(',', UserProfile::getAssitants());
@@ -11,6 +11,7 @@ foreach ($users as $key => $user) {
         if ($user->userProfile->prof_personal_staff != '0') {
             $assistant = $user->userProfile->profPersonalStaff->userProfile->prof_firstname;
         }
+
         $arrayUsers[$key + 1] = array(
             'parent_id' => $user->parent_id,
             'user_id' => $user->user_id,
@@ -18,49 +19,30 @@ foreach ($users as $key => $user) {
             'image' => $user->user_prof_image,
             'department' => $user->userProfile->profDepartment->dept_name,
             'assistant_id' => $user->userProfile->prof_personal_staff,
-            'assistant' => $assistant
+            'assistant' => $assistant,
         );
-
-//        if(isset($departments[$user->userProfile->profDepartment->dept_name])){
-//            array_push($departments[$user->userProfile->profDepartment->dept_name], $user->parent_id);
-//        }else{
-//            $departments[$user->userProfile->profDepartment->dept_name] = array($user->parent_id);
-//        }
     }
 }
-
-//foreach ($dist_parents as $key => $dist_parent) {
-//    $user_parent = Users::model()->findByAttributes(array('parent_id' => $dist_parent->parent_id));
-//
-//    $departments[$key+1] = array(
-//        'parent_id' => $dist_parent->parent_id,
-//        'dept_name' => $user_parent->userProfile->profDepartment->dept_name,
-//    );
-//}
-//
-//echo '<pre>';
-//print_r($departments);
-//
-//exit;
-
 
 function createTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $topParent) {
     foreach ($array as $categoryId => $category) {
         if ($currentParent == $category['parent_id']) {
+            $op_cl = 'closed';
             if ($currLevel > $prevLevel) {
                 if ($topParent == 0) {
                     echo '<ul id="browser" class="filetree">';
+                    $op_cl = 'open';
                 } else {
                     echo '<ul>';
                 }
             }
             if ($currLevel == $prevLevel)
                 echo '</li>';
-//            $assis = $category['assistant'] == '' ? '' : '<adjunct>' . '<a href="javascript:popup(' . $category['assistant_id'] . ')">' . $category['assistant'] . '</a></adjunct>';
-            echo '<li>' . '<span class="folder">'. $category['department'] .'</span>';
-//            echo '<li data-username="' . $category['name'] . '" data-userid="' . $category['user_id'] . '" class="big">' . $assis . '<em>' . $category['name'] . '</em><br/>'
-//            . '<a class="dialog_button" href="javascript:popup(' . $category['user_id'] . ')" data-dialog="prof_' . $category['user_id'] . '"><img class="orgainzeImage" title="' . $category['name'] . '" src="' . Yii::app()->createUrl('uploads/user/' . $category['image']) . '"/></a>'
-//            . '<p class="orgDept">' . $category['department'] . '</p>';
+
+            $sub_content = '<ul><li>' . '<span id="exp_user' . $category['user_id'] . '" class="manager"><a class="dialog_button" href="javascript:popup(' . $category['user_id'] . ')" data-dialog="prof_' . $category['user_id'] . '">' . $category['name'] . '</a></span></li></ul>';
+            $sub_content .= $category['assistant'] == '' ? '' : '<ul><li><span id="exp_user' . $category['assistant_id'] . '" class="assistant">' . '<a href="javascript:popup(' . $category['assistant_id'] . ')">' . $category['assistant'] . '</a></span></li></ul>';
+
+            echo '<li class="' . $op_cl . '">' . '<span class="folder">' . $category['department'] . '</span>' . $sub_content;
             if ($currLevel > $prevLevel) {
                 $prevLevel = $currLevel;
             }
@@ -72,33 +54,28 @@ function createTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $to
     if ($currLevel == $prevLevel)
         echo ' </li>  </ul> ';
 }
+
+$js = <<< EOD
+    $(".dialog_button").on("click", function(){
+        $("#a_prof_"+$(this).data("dialog")).trigger("click");
+    });
+EOD;
 ?>
 
-    <?php createTree($arrayUsers, 0, 0, -1, 0); ?>
-<!--<ul id="browser" class="filetree">
-        <li><span class="folder">Folder 1</span>
-            <ul>
-                <li><span class="file">Item 1.1</span></li>
-            </ul>
-        </li>
-        <li><span class="folder">Folder 2</span>
-            <ul>
-                <li><span class="folder">Subfolder 2.1</span>
-                    <ul id="folder21">
-                        <li><span class="file">File 2.1.1</span></li>
-                        <li><span class="file">File 2.1.2</span></li>
-                    </ul>
-                </li>
-                <li><span class="file">File 2.2</span></li>
-            </ul>
-        </li>
-        <li class="closed"><span class="folder">Folder 3 (closed at start)</span>
-            <ul>
-                <li><span class="file">File 3.1</span></li>
-            </ul>
-        </li>
-        <li><span class="file">File 4</span></li>
-    </ul>-->
+<div class="box grid_16" style="opacity: 1;">
+    <h2 class="box_head">Explore Structure</h2>
+    <div class="toggle_container">
+        <div class="block lines" style="opacity: 1;">
+            <div class="columns clearfix">
+                <div class="col_100 no_border_top">
+                    <div class="section">
+                        <?php createTree($arrayUsers, 0, 0, -1, 0); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php foreach ($users as $key => $user) { ?>
     <div class="display_none">
@@ -116,15 +93,15 @@ function createTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $to
                             <div class="col_25">
                                 <div class="section">
                                     <?=
-                                    CHtml::image('uploads/user/' . $user->user_prof_image, $user->user_name, array('width' => '55', 'id' => 'contactImage'))
+                                    CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), $user->user_name, array('width' => '55'))
                                     ?>
                                 </div>
                             </div>
                             <div class="col_75">
                                 <div class="section">
-                                    <h2 id="contactName"><?= $user->userProfile->prof_firstname ?></h2>
-                                    <h3 id="contactEmail"><?= $user->userProfile->profPosition->position_name ?></h3>
-                                    <h3><?= $user->userProfile->profDepartment->dept_name ?></h3>
+                                    <h2 id="contactName"><?php echo $firstname = $user->userProfile->prof_firstname ?></h2>
+                                    <h3 id="contactEmail"><?php echo $position = $user->userProfile->profPosition->position_name ?></h3>
+                                    <h3><?php echo $dept = $user->userProfile->profDepartment->dept_name ?></h3>
                                 </div>
                             </div>
                         </div>
@@ -133,7 +110,7 @@ function createTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $to
                                 <fieldset class="label_side top">
                                     <label><?= UserProfile::model()->getAttributeLabel('prof_phone') ?></label>
                                     <div>
-                                        <p><?= $user->userProfile->prof_phone ?></p>
+                                        <p><?php echo $phone = $user->userProfile->prof_phone ?></p>
                                     </div>
                                 </fieldset>
 
@@ -305,6 +282,18 @@ function createTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $to
     </div>
     </div>
     <?php
+    $img = CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), '', array('width' => '50', 'height' => '50', 'style' => 'margin-left:70px;'));
+    $js .= <<< EOD
+    $('ul li #exp_user$user->user_id').tooltipster({
+            content: $('$img<p style="text-align:center;"><b>$firstname</b></p><br /><p style="text-align:center;">$position</p><p style="text-align:center">$dept</p><p style="text-align:center">$phone</p>'),
+            // setting a same value to minWidth and maxWidth will result in a fixed width
+            minWidth: 200,
+            maxWidth: 200,
+            position: 'right',
+            theme: 'tooltipster-light'
+    });
+    
+EOD;
 }
 ?>
 <script type="text/javascript">
@@ -313,19 +302,8 @@ function createTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $to
     }
 </script>
 <?php
-$js = <<< EOD
-    $("#organisation").orgChart({container: $("#orgChart"), nodeClicked: onNodeClicked});
-    
-    $(".dialog_button").on("click", function(){
-        $("#a_prof_"+$(this).data("dialog")).trigger("click");
-    });
-    function onNodeClicked(_node) {
-        $("#a_prof_"+_node.data("userid")).trigger("click");
-    }
-EOD;
-
 Yii::app()->clientScript->coreScriptPosition = CClientScript::POS_END;
-Yii::app()->clientScript->registerScript('organisation', $js);
+Yii::app()->clientScript->registerScript('explore', $js);
 ?>
 
 <style type="text/css">

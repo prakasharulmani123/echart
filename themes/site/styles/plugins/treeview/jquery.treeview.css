@@ -5,7 +5,6 @@
 }
 
 .treeview ul {
-/*	background-color: white;*/
 	margin-top: 4px;
 }
 
@@ -72,3 +71,9 @@
 .filetree span.folder { background: url(images/folder.gif) 0 0 no-repeat; }
 .filetree li.expandable span.folder { background: url(images/folder-closed.gif) 0 0 no-repeat; }
 .filetree span.file { background: url(images/file.gif) 0 0 no-repeat; }
+
+.filetree span.manager, .filetree span.manager { padding: 1px 0 1px 16px; display: block; }
+.filetree span.manager { background: url(images/manager.png) 0 0 no-repeat; }
+
+.filetree span.assistant, .filetree span.assistant { padding: 1px 0 1px 16px; display: block; }
+.filetree span.assistant { background: url(images/assist.png) 0 0 no-repeat; }

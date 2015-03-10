@@ -104,11 +104,16 @@ class Users extends CActiveRecord {
             'TreeBehavior' => array(
                 'class' => 'ext.behaviors.XTreeBehavior',
                 'treeLabelMethod' => 'getTreeLabel',
+                'treeLabelMethod2' => 'getTreeLabel2',
 //                'menuUrlMethod' => 'getMenuUrl',
             ),
         );
     }
 
+    public function getTreeLabel2() {
+        return CHtml::link($this->userProfile->profDepartment->dept_name, Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->user_id));
+    }
+    
     public function getTreeLabel() {
         $label = '';
         $label .= '<span id="orgainzeImage'.$this->user_id.'">';
