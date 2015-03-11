@@ -265,9 +265,12 @@ Yii::app()->clientScript->registerScript('organisation', $js);
         display: none !important;
     }
 
+    div.orgChart div.node.big {
+        height: 86px;
+    }
 <?php if (isset($_GET['phone'])) { ?>
-        div.orgChart div.node.big {
+/*        div.orgChart div.node.big {
             height: auto;
-        }
+        }*/
 <?php } ?>
 </style>

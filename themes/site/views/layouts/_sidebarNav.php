@@ -7,7 +7,7 @@
         'items' => array(
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/laptop.png") . '<span class="display_none">Home</span>', 'url' => '#', 'itemOptions' => array('class' => 'icon_only')),
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Find</span>', 'url' => $this->createUrl('/site/users/find')),
-            array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Print</span>', 'url' => $this->createUrl('/site/default/download')),
+            array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Print</span>', 'url' => $this->createUrl('/site/default/print')),
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Go to structure</span>', 'url' => '#', 'linkOptions' => array('class' => 'dialog_button', 'data-dialog' => 'go_structure')),
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Explore Structure</span>', 'url' => $this->createUrl('/site/users/explore')),
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Options</span>', 'url' => '#',

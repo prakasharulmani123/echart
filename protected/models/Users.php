@@ -25,6 +25,7 @@ class Users extends CActiveRecord {
     public $new_password;
     public $confirm_password;
     public $_photo;
+    public $print;
 
     /**
      * @return string the associated database table name
@@ -114,6 +115,7 @@ class Users extends CActiveRecord {
         return CHtml::link($this->userProfile->profDepartment->dept_name, Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->user_id));
     }
     
+    //organize chart label
     public function getTreeLabel() {
         $label = '';
         $label .= '<span id="orgainzeImage'.$this->user_id.'">';
@@ -126,33 +128,39 @@ class Users extends CActiveRecord {
         
         $label .= '</span>';
         
-        if (isset($_GET['phone']) && $_GET['phone'] == true) {
-            $label .= '<p class="orgDept">' . $this->userProfile->prof_phone . '</p>';
-        }
         $label .= '<p class="orgDept">' . $this->userProfile->profDepartment->dept_name . '</p>';
+        
+        $label .= '<p class="orgDept">' . $this->userProfile->prof_phone . '</p>';
+//        if (isset($_GET['phone']) && $_GET['phone'] == true) {
+//            $label .= '<p class="orgDept">' . $this->userProfile->prof_phone . '</p>';
+//        }
 
+        //get child count
+        $childs = Yii::app()->db->createCommand(
+                        'SELECT GetFamilyTree(user_id) as childs
+                FROM app_users
+                Where user_id = "' . $this->user_id . '"')->queryRow();
+        if($childs['childs'] == ''){
+            $staff_count = '';
+        }else{
+            $child_exp = explode(',', $childs['childs']);
+            $staff_count = count($child_exp);
+        }
+        //end
+        
         if (isset($_GET['staff']) && $_GET['staff'] == true) {
-            $childs = Yii::app()->db->createCommand(
-                            'SELECT GetFamilyTree(user_id) as childs
-                    FROM app_users
-                    Where user_id = "' . $this->user_id . '"')->queryRow();
-            if($childs['childs'] == ''){
-                $staff_count = '';
-            }else{
-                $child_exp = explode(',', $childs['childs']);
-                $staff_count = count($child_exp);
-            }
             $label .= '<p class="orgDept">' . $staff_count . '</p>';
         }
         
-        $move_img = CHtml::link(
-                CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/navidown.gif')),
-                Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->user_id), array('title' => 'Down in hierarchy'));
+        $move_img = $staff_count != '' ? CHtml::link(
+                CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/naviup.gif')),
+                Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->user_id), array('title' => 'Up in hierarchy')) : '';
+        
         if (isset($_GET['userid']) && $_GET['userid'] != '') {
-            if($_GET['userid'] == $this->user_id){
+            if($_GET['userid'] == $this->user_id && $this->parent_id != '0'){
                 $move_img = CHtml::link(
-                        CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/naviup.gif')),
-                        Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->parent_id), array('title' => 'Up in hierarchy'));
+                        CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/navidown.gif')),
+                        Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->parent_id), array('title' => 'Down in hierarchy'));
             }
         }
         $label .= '<p class="orgDept">'.$move_img. '</p>';
@@ -179,7 +187,8 @@ class Users extends CActiveRecord {
             'confirm_password' => 'Confirm Password',
             'new_password' => 'New Password',
             'reset_password_string' => 'Password Reset String',
-            'is_personal_staff' => 'User Type'
+            'is_personal_staff' => 'User Type',
+            'print' => 'Generate with format'
         );
     }
 
