@@ -130,7 +130,9 @@ class Users extends CActiveRecord {
         
         $label .= '<p class="orgDept">' . $this->userProfile->profDepartment->dept_name . '</p>';
         
-        $label .= '<p class="orgDept">' . $this->userProfile->prof_phone . '</p>';
+        if(!isset($_GET['staff'])){
+            $label .= '<p class="orgDept">' . $this->userProfile->prof_phone . '</p>';
+        }
 //        if (isset($_GET['phone']) && $_GET['phone'] == true) {
 //            $label .= '<p class="orgDept">' . $this->userProfile->prof_phone . '</p>';
 //        }
@@ -163,7 +165,7 @@ class Users extends CActiveRecord {
                         Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->parent_id), array('title' => 'Down in hierarchy'));
             }
         }
-        $label .= '<p class="orgDept">'.$move_img. '</p>';
+        $label .= '<p class="orgDept hire_img">'.$move_img. '</p>';
         return $label;
     }
 

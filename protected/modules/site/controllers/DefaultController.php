@@ -45,8 +45,7 @@ class DefaultController extends Controller {
             if (Yii::app()->file->set($filePath)->exists) {
                 $myfile->download();
             } else {
-
-                echo Translate::__('File Not Found');
+                echo 'File Not Found';
             }
             exit;
 

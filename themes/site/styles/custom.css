@@ -53,3 +53,12 @@ input.error{
 #browser {
   width: 25%;
 }
+
+.hire_img, .hire_img a{
+    float: right;
+    border-bottom: medium none !important; 
+}
+
+.flat_area h2{
+    box-shadow: none !important;
+}
