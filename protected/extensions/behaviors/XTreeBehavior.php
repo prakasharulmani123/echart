@@ -161,8 +161,9 @@ class XTreeBehavior extends CActiveRecordBehavior {
      * @var string the name of owner model method to format tree label
      */
     public $treeLabelMethod = null;
-    /*additional label*/
+    /* additional label */
     public $treeLabelMethod2 = null;
+
     /**
      * @var string the name of owner model method to format tree url
      */
@@ -418,19 +419,32 @@ class XTreeBehavior extends CActiveRecordBehavior {
         $subItems = array();
 
         if ($owner->children) {
-            if(isset($_GET['manager']) && $_GET['manager'] == true){
+            if (isset($_GET['manager']) && $_GET['manager'] == true) {
                 $managers_list = Position::model()->managersList();
-                foreach ($owner->children as $child){
+                foreach ($owner->children as $child) {
                     if (in_array($child->userProfile->profPosition->position_id, $managers_list)) {
                         $subItems[] = $child->getTreeSubItems($organize_chart);
                     }
                 }
-            }else{
+            } elseif (isset($_GET['organization']) && $_GET['organization'] == true) {
+                foreach ($owner->children as $child){
+                    $childs = Yii::app()->db->createCommand(
+                                    'SELECT GetFamilyTree(user_id) as childs
+                    FROM app_users
+                    Where user_id = "' . $child->user_id . '"')->queryRow();
+                    $staff_count = 0;
+                    if ($childs['childs'] != '') {
+                        $child_exp = explode(',', $childs['childs']);
+                        $staff_count = count($child_exp);
+                    }
+                    $staff_count > 0 ? $subItems[] = $child->getTreeSubItems($organize_chart) : '';
+                }
+            } else {
                 foreach ($owner->children as $child)
                     $subItems[] = $child->getTreeSubItems($organize_chart);
             }
         }
-        $items = $this->formatTreeItem($owner,$organize_chart);
+        $items = $this->formatTreeItem($owner, $organize_chart);
         if ($subItems != array())
             $items = array_merge($items, array('children' => $subItems));
         return $items;
@@ -499,14 +513,14 @@ class XTreeBehavior extends CActiveRecordBehavior {
      * @param model the instance of ActiveRecord
      * @return array of tree item formatted for CTreeview widget
      */
-    protected function formatTreeItem($model,$organize_chart = false) {
-        if ($this->treeLabelMethod !== null){
-            if($organize_chart == true){
+    protected function formatTreeItem($model, $organize_chart = false) {
+        if ($this->treeLabelMethod !== null) {
+            if ($organize_chart == true) {
                 $label = $model->{$this->treeLabelMethod}();
-            }else{
+            } else {
                 $label = $model->{$this->treeLabelMethod2}();
             }
-        }else{
+        } else {
             $label = $model->getAttribute($this->label);
         }
 
@@ -519,9 +533,9 @@ class XTreeBehavior extends CActiveRecordBehavior {
 
         if (!is_null($model->userProfile->profPersonalStaff) && !isset($_GET['manager']) && !isset($_GET['organization']) && $organize_chart == true) {
             $assistant = $model->userProfile->profPersonalStaff;
-            $img_path = Yii::app()->createAbsoluteUrl('uploads/user/'.$assistant->user_prof_image);
-            $text .= '<adjunct>' . '<span id="orgainzeImage'.$assistant->user_id.'"><a href="javascript:popup(' . $assistant->user_id . ')">'
-                    . '<img src="'.$img_path.'" class="orgainzeImage" />'
+            $img_path = Yii::app()->createAbsoluteUrl('uploads/user/' . $assistant->user_prof_image);
+            $text .= '<adjunct>' . '<span id="orgainzeImage' . $assistant->user_id . '"><a href="javascript:popup(' . $assistant->user_id . ')">'
+                    . '<img src="' . $img_path . '" class="orgainzeImage" />'
                     . $assistant->userProfile->prof_firstname
                     . '</a></span></adjunct>';
         }

@@ -142,9 +142,9 @@ class Users extends CActiveRecord {
                         'SELECT GetFamilyTree(user_id) as childs
                 FROM app_users
                 Where user_id = "' . $this->user_id . '"')->queryRow();
-        if($childs['childs'] == ''){
-            $staff_count = '';
-        }else{
+        
+        $staff_count = '';
+        if($childs['childs'] != ''){
             $child_exp = explode(',', $childs['childs']);
             $staff_count = count($child_exp);
         }
@@ -154,7 +154,7 @@ class Users extends CActiveRecord {
             $label .= '<p class="orgDept">' . $staff_count . '</p>';
         }
         
-        $move_img = $staff_count != '' ? CHtml::link(
+        $move_img = ($staff_count != '' && $this->parent_id != '0') ? CHtml::link(
                 CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/naviup.gif')),
                 Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->user_id), array('title' => 'Up in hierarchy')) : '';
         
