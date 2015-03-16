@@ -84,3 +84,9 @@ input.error{
 .flat_area h2{
     box-shadow: none !important;
 }
+
+.tooltipstered{
+  color: black;
+  font-family: arial;
+  font-style: normal;
+}

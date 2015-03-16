@@ -35,15 +35,15 @@ div.orgChart tr.lines td.line {
 }
 
 div.orgChart tr.lines td.top {
-    border-top            : 3px solid black;
+    border-top            : 1px solid black;
 }
 
 div.orgChart tr.lines td.left {
-    border-right          : 2px solid black;
+    border-right          : 1px solid black;
 }
 
 div.orgChart tr.lines td.right {
-    border-left           : 2px solid black;
+    border-left           : 1px solid black;
 }
 
 div.orgChart td {
@@ -54,18 +54,18 @@ div.orgChart td {
 
 div.orgChart div.node {
     cursor                : default;
-    border                : 2px solid black;
+    border                : 1px solid black;
     display               : inline-block;
-    padding               : 0 4px;
+    padding: 5px 0;
     width                 : 96px;
     height                : 60px;
     background-color      : #ffffcf;
     line-height           : 1.3em;
-    border-radius         : 8px;
+    border-radius         : 4px;
     box-shadow            : 4px 4px 6px #888888;
-    -moz-border-radius    : 8px;
+    -moz-border-radius    : 4x;
     -moz-box-shadow       : 4px 4px 6px #888888;
-    -webkit-border-radius : 8px;
+    -webkit-border-radius : 4px;
     -webkit-box-shadow    : 4px 4px 6px #888888;
 }
 
@@ -86,18 +86,18 @@ div.orgChart div.adjunct.node {
     margin-top            : 8px;
     margin-left           : -100px;
     width                 : 135px;
-    height                : 48px;
+    height                : auto;
     background-color      : #efefef;
 }
 
 div.orgChart div.adjunct-link {
     display               : inline-block;
     position              : absolute;
-    margin-left           : -20px;
-    margin-top            : 25px;
+    /*margin-left           : -20px;*/
+    top: -35px !important;
     width                 : 20px;
     /*height                : 2px;*/
-    border                : 1px dashed black;
+    border                : 1px solid black;
 }
 
 p, dl, hr, h1, h2, h3, h4, h5, h6, ol, ul, pre, table, address {
@@ -106,17 +106,18 @@ p, dl, hr, h1, h2, h3, h4, h5, h6, ol, ul, pre, table, address {
 
 div.orgChart div.node.big {
 height: 65px;
-width: 168px;
+width: 150px;
 }
 div.orgChart div.node.big .orgainzeImage {
-    border: 2px solid black;
+    border: 1px solid black;
     border-radius: 4px;
 }
 
 .orgainzeImage{
-    float: left;
-    width: 36px;
-    height: 41px;
+  float: none !important;
+  height: 41px;
+  margin: 10px auto;
+  width: 36px;
 }
 
 div.adjunct.node, .adjunct-link{
@@ -125,4 +126,22 @@ div.adjunct.node, .adjunct-link{
 
 div.adjunct.node{
     margin-left: -50px !important;
+}
+
+/*div.orgChart td {
+  padding: 0 1px !important;
+}*/
+
+.dialog_button {
+  display: block !important;
+  float: none;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+.block p, .flat_area p {
+  color: #000000;
+  font-weight: normal;
+  line-height: 16px;
+  margin: 0 0 10px;
 }

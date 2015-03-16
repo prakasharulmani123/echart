@@ -93,7 +93,7 @@ fieldset > label {
 .flat_area h4,
 .flat_area h5,
 .flat_area h6 {
-  letter-spacing: -1px !important;
+/*  letter-spacing: -1px !important;*/
   font-family: 'Open Sans', sans-serif;
   margin-bottom: 15px;
 }
