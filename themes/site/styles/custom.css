@@ -54,9 +54,31 @@ input.error{
   width: 25%;
 }
 
+.orgDept{
+    width: 100%;
+}
+
+.orgStaff{
+    width: 100%;
+}
+
+.orgPhone{
+    width: 100%;
+}
+
+.orgEmail{
+    width: 90%;
+    float: left;
+    word-wrap: break-word;
+}
+
 .hire_img, .hire_img a{
     float: right;
     border-bottom: medium none !important; 
+}
+
+.hire_img a{
+    padding: 6px 0;
 }
 
 .flat_area h2{

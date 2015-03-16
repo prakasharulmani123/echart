@@ -106,7 +106,7 @@ p, dl, hr, h1, h2, h3, h4, h5, h6, ol, ul, pre, table, address {
 
 div.orgChart div.node.big {
 height: 65px;
-width: 185px;
+width: 168px;
 }
 div.orgChart div.node.big .orgainzeImage {
     border: 2px solid black;
@@ -117,9 +117,6 @@ div.orgChart div.node.big .orgainzeImage {
     float: left;
     width: 36px;
     height: 41px;
-}
-.orgDept{
-    width: 100%;
 }
 
 div.adjunct.node, .adjunct-link{

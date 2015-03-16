@@ -531,7 +531,7 @@ class XTreeBehavior extends CActiveRecordBehavior {
 
         $text = CHtml::link($label, $url, array('id' => $model->getAttribute($this->id)));
 
-        if (!is_null($model->userProfile->profPersonalStaff) && !isset($_GET['manager']) && !isset($_GET['organization']) && $organize_chart == true) {
+        if (!is_null($model->userProfile->profPersonalStaff) && /*!isset($_GET['manager']) &&*/ !isset($_GET['organization']) && $organize_chart == true) {
             $assistant = $model->userProfile->profPersonalStaff;
             $img_path = Yii::app()->createAbsoluteUrl('uploads/user/' . $assistant->user_prof_image);
             $text .= '<adjunct>' . '<span id="orgainzeImage' . $assistant->user_id . '"><a href="javascript:popup(' . $assistant->user_id . ')">'

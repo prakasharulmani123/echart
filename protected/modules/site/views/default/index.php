@@ -266,11 +266,11 @@ Yii::app()->clientScript->registerScript('organisation', $js);
     }
 
     div.orgChart div.node.big {
-        height: 86px;
+        height: auto;
     }
-<?php if (isset($_GET['phone'])) { ?>
-/*        div.orgChart div.node.big {
-            height: auto;
-        }*/
+<?php if (isset($_GET['staff'])) { ?>
+    div.orgChart div.node.big {
+        height: 83px;
+    }
 <?php } ?>
 </style>

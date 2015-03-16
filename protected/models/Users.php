@@ -128,15 +128,8 @@ class Users extends CActiveRecord {
         
         $label .= '</span>';
         
-        $label .= '<p class="orgDept">' . $this->userProfile->profDepartment->dept_name . '</p>';
+        $label .= '<div class="orgDept"><p>' . $this->userProfile->profDepartment->dept_name . '</p></div>';
         
-        if(!isset($_GET['staff'])){
-            $label .= '<p class="orgDept">' . $this->userProfile->prof_phone . '</p>';
-        }
-//        if (isset($_GET['phone']) && $_GET['phone'] == true) {
-//            $label .= '<p class="orgDept">' . $this->userProfile->prof_phone . '</p>';
-//        }
-
         //get child count
         $childs = Yii::app()->db->createCommand(
                         'SELECT GetFamilyTree(user_id) as childs
@@ -151,21 +144,39 @@ class Users extends CActiveRecord {
         //end
         
         if (isset($_GET['staff']) && $_GET['staff'] == true) {
-            $label .= '<p class="orgDept">' . $staff_count . '</p>';
+            $label .= '<div class="orgStaff"><p>' . $staff_count . '</p></div>';
+        }
+        
+        $ext_link = '';
+        if(isset($_GET['staff'])){
+            $ext_link .= '&staff=true';
+        }elseif(isset($_GET['organization'])){
+            $ext_link .= '&organization=true';
+        }elseif(isset($_GET['manager'])){
+            $ext_link .= '&manager=true';
         }
         
         $move_img = ($staff_count != '' && $this->parent_id != '0') ? CHtml::link(
-                CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/naviup.gif')),
-                Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->user_id), array('title' => 'Up in hierarchy')) : '';
+                CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/navidown.gif')),
+                Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->user_id.$ext_link), array('title' => 'Up in hierarchy')) : '';
         
         if (isset($_GET['userid']) && $_GET['userid'] != '') {
             if($_GET['userid'] == $this->user_id && $this->parent_id != '0'){
                 $move_img = CHtml::link(
-                        CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/navidown.gif')),
-                        Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->parent_id), array('title' => 'Down in hierarchy'));
+                        CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/naviup.gif')),
+                        Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->parent_id.$ext_link), array('title' => 'Down in hierarchy'));
             }
         }
-        $label .= '<p class="orgDept hire_img">'.$move_img. '</p>';
+        
+        if(!isset($_GET['staff'])){
+            $this->userProfile->prof_phone != '' ? $label .= '<div class="orgPhone"><p>' . $this->userProfile->prof_phone . '</p></div>' : '';
+            $this->user_email != '' ? $label .= '<div class="orgEmail"><p>' . $this->user_email.'</p></div>' : '';
+            $label .= '<div class="hire_img">'.$move_img. '</div>';
+        }
+//        if (isset($_GET['phone']) && $_GET['phone'] == true) {
+//            $label .= '<p class="orgDept">' . $this->userProfile->prof_phone . '</p>';
+//        }
+
         return $label;
     }
 
