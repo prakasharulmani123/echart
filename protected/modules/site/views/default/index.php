@@ -269,8 +269,8 @@ Yii::app()->clientScript->registerScript('organisation', $js);
         height: auto;
     }
 <?php if (isset($_GET['staff'])) { ?>
-    div.orgChart div.node.big {
+/*    div.orgChart div.node.big {
         height: 83px;
-    }
+    }*/
 <?php } ?>
 </style>
