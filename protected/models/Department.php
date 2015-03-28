@@ -28,9 +28,9 @@ class Department extends CActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('dept_name, dept_parent_id', 'required'),
+            array('dept_name', 'required'),
             array('dept_name', 'length', 'max' => 150),
-            array('dept_head_user_id', 'length', 'max' => 20),
+            array('dept_parent_id, dept_head_user_id', 'length', 'max' => 20),
             array('status', 'length', 'max' => 1),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
