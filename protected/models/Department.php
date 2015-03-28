@@ -28,12 +28,13 @@ class Department extends CActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('dept_name', 'required'),
+            array('dept_name, dept_parent_id', 'required'),
             array('dept_name', 'length', 'max' => 150),
+            array('dept_head_user_id', 'length', 'max' => 20),
             array('status', 'length', 'max' => 1),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('dept_id, dept_name, status', 'safe', 'on' => 'search'),
+            array('dept_id, dept_parent_id, dept_name, status, dept_head_user_id, dept_head_user_id', 'safe', 'on' => 'search'),
         );
     }
 
@@ -53,6 +54,10 @@ class Department extends CActiveRecord {
         return array(
             'userProfiles' => array(self::HAS_MANY, 'UserProfile', 'prof_department'),
             'userProfiles1' => array(self::HAS_MANY, 'UserProfile', 'prof_department_2'),
+            'children' => array(self::HAS_MANY, 'Department', 'dept_parent_id', 'order' => 'dept_name'),
+            'childCount' => array(self::STAT, 'Department', 'dept_parent_id'),
+            'deptHead' => array(self::BELONGS_TO, 'Users', 'dept_head_user_id'),
+            'deptParent' => array(self::BELONGS_TO, 'Department', 'dept_parent_id'),
         );
     }
 
@@ -62,6 +67,8 @@ class Department extends CActiveRecord {
     public function attributeLabels() {
         return array(
             'dept_id' => 'Dept',
+            'dept_parent_id' => 'Parent Dept',
+            'dept_head_user_id' => 'Dept Head',
             'dept_name' => 'Dept Name',
             'status' => 'Status',
         );

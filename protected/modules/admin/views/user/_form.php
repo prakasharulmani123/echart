@@ -1,7 +1,8 @@
 <?php
+$users = CHtml::listData(Users::model()->with('userProfile')->isActive()->isNotAssistnant()->findAll(), 'user_id', 'userProfile.prof_firstname');
 $companies = CHtml::listData(Company::model()->isActive()->findAll(), 'company_id', 'company_name');
 $sites = CHtml::listData(Site::model()->isActive()->findAll(), 'site_id', 'site_name');
-$secratey = CHtml::listData(Users::model()->isActive()->findAll(), 'user_id', 'user_name');
+$secratey = CHtml::listData(Users::model()->isActive()->isAssistnant()->findAll(), 'user_id', 'user_name');
 $departments = CHtml::listData(Department::model()->isActive()->findAll(), 'dept_id', 'dept_name');
 $positions = CHtml::listData(Position::model()->isActive()->findAll(), 'position_id', 'position_name');
 
@@ -42,7 +43,7 @@ $form = $this->beginWidget('CActiveForm', array(
                     </div>
                 </fieldset>
 
-        <fieldset class="label_side top">
+<!--        <fieldset class="label_side top">
             <?php echo $form->labelEx($model, 'parent_id'); ?>
             <div class="clearfix">
                 <?php
@@ -55,6 +56,22 @@ $form = $this->beginWidget('CActiveForm', array(
                                 <?php echo $model->user_id == $parent["id"] ? 'disabled' : '' ?>><?php echo $parent["name"]; ?></option>
                             <?php } ?>
                 </select>
+            </div>
+        </fieldset>-->
+        
+<!--                                <fieldset class="label_side top parent_field" style="display: none">
+            <?php echo $form->labelEx($model, 'parent_id'); ?>
+            <div class="clearfix">
+                <?php echo $form->dropDownList($model, 'parent_id', $users, array('class' => 'uniform', 'prompt' => '')); ?>
+                <?php echo $form->error($model, 'parent_id'); ?>
+            </div>
+        </fieldset>-->
+        
+        <fieldset class="label_side top personal_staff_field">
+            <?php echo $form->labelEx($model, 'parent_dept_id'); ?>
+            <div class="clearfix">
+                <?php echo $form->dropDownList($model, 'parent_dept_id', $departments, array('class' => 'uniform', 'prompt' => '')); ?>
+                <?php echo $form->error($model, 'parent_dept_id'); ?>
             </div>
         </fieldset>
 
@@ -107,7 +124,7 @@ $form = $this->beginWidget('CActiveForm', array(
                 <?php echo $form->error($profModel, 'prof_department'); ?>
             </div>
         </fieldset>
-        <fieldset class="label_side top" id="personal_staff_field">
+        <fieldset class="label_side top personal_staff_field">
             <?php echo $form->labelEx($profModel, 'prof_personal_staff'); ?>
             <div class="clearfix">
                 <?php echo $form->dropDownList($profModel, 'prof_personal_staff', $secratey, array('class' => 'uniform', 'prompt' => '')); ?>
@@ -246,9 +263,11 @@ $js = <<< EOD
         $(document).ready(function(){
             $("#Users_is_personal_staff").on("change", function(){
                 if($(this).val() == '0'){
-                    $("#personal_staff_field").show();
+                    $(".personal_staff_field").show();
+                    $(".parent_field").hide();
                 }else{
-                    $("#personal_staff_field").hide();
+                    $(".personal_staff_field").hide();
+                    $(".parent_field").show();
                 }
             });
         });

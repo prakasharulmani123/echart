@@ -24,7 +24,7 @@ class DepartmentController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('index', 'view', 'create', 'update', 'delete'),
+                'actions' => array('index', 'view', 'create', 'update', 'delete', 'adduser'),
                 'users' => array('@'),
             ),
             array('deny', // deny all users
@@ -139,6 +139,30 @@ class DepartmentController extends Controller {
             echo CActiveForm::validate($model);
             Yii::app()->end();
         }
+    }
+    
+    public function actionAdduser($id) {
+        $model = $this->loadModel($id);
+
+        // Uncomment the following line if AJAX validation is needed
+        // $this->performAjaxValidation($model);
+
+        if (isset($_POST['Department'])) {
+            $model->attributes = $_POST['Department'];
+            if ($model->save()) {
+                if($model->dept_head_user_id != ''){
+                    $user_model = Users::model()->findByPk($model->dept_head_user_id);
+                    $user_model->parent_dept_id = $model->dept_parent_id;
+                    $user_model->save();
+                    Yii::app()->user->setFlash('green', 'Successfully Updated');
+                    $this->redirect(array('index'));
+                }
+            }
+        }
+
+        $this->render('_adduser', array(
+            'model' => $model,
+        ));
     }
 
 }

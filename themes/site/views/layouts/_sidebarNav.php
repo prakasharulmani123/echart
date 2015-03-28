@@ -67,16 +67,16 @@
 <div class="display_none">
     <div id="go_structure" class="dialog_content" title="Go to structure">
          <?php
-                    $this->widget('CTreeView', array(
-                        'id' => 'structure',
-                        'data' => Users::model()->getTreeItems(1, true, false),
-                        'control' => '#structure',
-                        'animated' => 'fast',
-                        'collapsed' => false,
-                        'htmlOptions' => array(
-                            'class' => 'filetree',
-                        )
-                    ));
+//                    $this->widget('CTreeView', array(
+//                        'id' => 'structure',
+//                        'data' => Users::model()->getTreeItems(1, true, false),
+//                        'control' => '#structure',
+//                        'animated' => 'fast',
+//                        'collapsed' => false,
+//                        'htmlOptions' => array(
+//                            'class' => 'filetree',
+//                        )
+//                    ));
                 ?>
     </div>
 </div>

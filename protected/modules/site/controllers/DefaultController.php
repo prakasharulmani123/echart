@@ -2,12 +2,22 @@
 
 class DefaultController extends Controller {
 
-    public function actionIndex() {
+    public function actionIndexold() {
         $userid = isset($_GET['userid']) ? $_GET['userid'] : '1';
         $depth = isset($_GET['depth']) ? $_GET['depth'] : 5;
 
-        $this->render('index', array(
+        $this->render('index_old', array(
             'userid' => $userid,
+            'depth' => $depth
+        ));
+    }
+
+    public function actionIndex() {
+        $deptid = isset($_GET['deptid']) ? $_GET['deptid'] : '1';
+        $depth = isset($_GET['depth']) ? $_GET['depth'] : 5;
+
+        $this->render('index', array(
+            'deptid' => $deptid,
             'depth' => $depth
         ));
     }

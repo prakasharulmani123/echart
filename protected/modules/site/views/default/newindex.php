@@ -1,29 +1,21 @@
 <?php
 if($deptid > 1){
     $depts = Yii::app()->db->createCommand(
-                "SELECT GetDeptTree(dept_id) as depts
+                "SELECT GetFamilyTree(dept_id) as depts
                 FROM app_departmets
                 Where dept_id = '{$deptid}'")->queryRow();
 
-    $depts = "'".$deptid."','".str_replace(",", "','", $depts['depts'])."'";
+    $depts = "'".str_replace(",", "','", $depts['depts'])."'";
     $departments = Department::model()->findAll("dept_id IN ({$depts}) And status = '1'");
 }else{
     $departments = Department::model()->isActive()->findAll();
 }
-//echo '<pre>';
-//print_r($departments);
-
-
 $arrayDepartments = $deptKeys = array();
 foreach ($departments as $key => $department) {
     if($department->childCount > 0){
         $deptKeys[$department->dept_id] = $department->dept_name;
     }
 }
-//echo '<pre>';
-//print_r($deptKeys);
-
-
 $unique_dept = $unique_users =array();
 $i = 1;
 $show_dept_without_users = false;
@@ -31,21 +23,16 @@ foreach ($departments as $key => $department) {
     if($department->childCount > 0){
         if(isset($department->deptHead->user_id) || $show_dept_without_users == true){
             $key = array_search($department->dept_name, $deptKeys);
-            
-            if($deptid > 1){
-                $parentkey = $department->dept_id == $deptid ? 0 : array_search($department->deptParent->dept_name, $deptKeys);
-            }else{
-                $parentkey = array_search($department->deptParent->dept_name, $deptKeys);
-            }
+            $parentkey = array_search($department->deptParent->dept_name, $deptKeys);
             $arrayDepartments[$key] = array(
-                'org_parent_id' => $department->dept_parent_id,
+//                'parent_id' => $department->dept_parent_id,
                 'parent_id' => $parentkey != '' ? $parentkey : 0,
                 'dept_id' => $department->dept_id,
                 'dept_name' => $department->dept_name,
                 'user_name' => isset($department->deptHead->userProfile->prof_firstname) ? $department->deptHead->userProfile->prof_firstname : '',
                 'user_id' => isset($department->deptHead->user_id) ? $department->deptHead->user_id : '',
                 'user_image' => isset($department->deptHead->user_prof_image) ? $department->deptHead->user_prof_image : '',
-                'user_phone' => isset($department->deptHead->userProfile->prof_mobile) ? $department->deptHead->userProfile->prof_mobile : '',
+                'user_phone' => isset($department->deptHead->userProfile->prof_phone) ? $department->deptHead->userProfile->prof_phone : '',
                 'user_email' => isset($department->deptHead->user_email) ? $department->deptHead->user_email : '',
                 'dept_head' => true,
             );
@@ -60,10 +47,7 @@ foreach ($departments as $key => $department) {
         }
     }
 }
-//echo '<pre>';
-//print_r($arrayDepartments);
-
-$arr_count = key(array_slice($arrayDepartments, -1, 1, TRUE))+1;
+$arr_count = count($arrayDepartments)+1;
 foreach ($departments as $key => $department) {
     if($department->childCount > 0){
         if($department->dept_parent_id != 0){
@@ -79,7 +63,7 @@ foreach ($departments as $key => $department) {
                         $parentkey = array_search($department->deptParent->dept_name, $deptKeys);
                         $arr_count++;
                         $arrayDepartments[$arr_count] = array(
-                            'org_parent_id' => $department->dept_parent_id,
+//                            'parent_id' => $department->dept_parent_id,
                             'parent_id' => $parentkey,
                             'dept_id' => $user->userProfile->profDepartment->dept_id,
                             'dept_name' => $user->userProfile->profDepartment->dept_name,
@@ -102,9 +86,6 @@ foreach ($departments as $key => $department) {
         }
     }
 }
-//echo '<pre>';
-//print_r($arrayDepartments);
-//exit;
 
 function createDeptTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $topParent) {
     foreach ($array as $categoryId => $category) {
@@ -129,33 +110,10 @@ function createDeptTree($array, $currentParent, $currLevel = 0, $prevLevel = -1,
             $label .= "</a>";
             $label .= "</span>";
             $label .= "<div class='orgDept'><p>{$category['dept_name']}</p></div>";
-            
-            $staff_count = '';
-            $ext_link = '';
-            if(isset($_GET['staff'])){
-                $ext_link .= '&staff=true';
-            }elseif(isset($_GET['organization'])){
-                $ext_link .= '&organization=true';
-            }elseif(isset($_GET['manager'])){
-                $ext_link .= '&manager=true';
-            }
-            
-            $move_img = (/*$staff_count != '' && */$category['org_parent_id'] != '0') ? CHtml::link(
-                CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/navidown.gif')),
-                Yii::app()->createAbsoluteUrl('site/default/index?deptid='.$category['dept_id'].$ext_link), array('title' => 'Up in hierarchy')) : '';
-        
-            if (isset($_GET['deptid']) && $_GET['deptid'] != '') {
-                if($_GET['deptid'] == $category['user_id'] && $category['org_parent_id'] != '0'){
-                    $move_img = CHtml::link(
-                            CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/naviup.gif')),
-                            Yii::app()->createAbsoluteUrl('site/default/index?deptid='.$category['org_parent_id'].$ext_link), array('title' => 'Down in hierarchy'));
-                }
-            }
-
             if(!isset($_GET['staff'])){
                 $label .= $category['user_phone'] != '' ? "<div class='orgPhone'><p>{$category['user_phone']}</p></div>" : '';
                 $label .= $category['user_email'] != '' ? "<div class='orgEmail'><p>{$category['user_email']}</p></div>" : '';
-                $label .= '<div class="hire_img">'.$move_img. '</div>';
+//                $label .= '<div class="hire_img">'.$move_img. '</div>';
             }
             
             if (isset($category['assistant_name']) && !isset($_GET['organization']) /*&& $organize_chart == true*/) {

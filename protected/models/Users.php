@@ -40,6 +40,7 @@ class Users extends CActiveRecord {
             'isActive' => array('condition' => "$alias.user_status = '1'"),
             'isParent' => array('condition' => "$alias.parent_id = '0'"),
             'isNotAssistnant' => array('condition' => "$alias.is_personal_staff <> '1'"),
+            'isAssistnant' => array('condition' => "$alias.is_personal_staff = '1'"),
             'notSelf' => array('condition' => "$alias.user_id = '" . Yii::app()->user->id . "'"),
         );
     }
@@ -61,7 +62,7 @@ class Users extends CActiveRecord {
             array('user_last_login, created, modified', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('user_id, user_email, user_password, user_status, user_activation_key, user_last_login, user_login_ip, created, modified, reset_password_string', 'safe'),
+            array('user_id, parent_dept_id, user_email, user_password, user_status, user_activation_key, user_last_login, user_login_ip, created, modified, reset_password_string', 'safe'),
         );
     }
 
@@ -95,21 +96,22 @@ class Users extends CActiveRecord {
         return array(
             'userProfile' => array(self::HAS_ONE, 'UserProfile', 'user_id'),
             'parent' => array(self::BELONGS_TO, 'Users', 'parent_id'),
+            'parentDept' => array(self::BELONGS_TO, 'Department', 'parent_dept_id'),
             'children' => array(self::HAS_MANY, 'Users', 'parent_id', 'order' => 'user_name', 'condition' => "is_personal_staff <> '1'"),
             'childCount' => array(self::STAT, 'Users', 'parent_id'),
         );
     }
 
-    public function behaviors() {
-        return array(
-            'TreeBehavior' => array(
-                'class' => 'ext.behaviors.XTreeBehavior',
-                'treeLabelMethod' => 'getTreeLabel',
-                'treeLabelMethod2' => 'getTreeLabel2',
-//                'menuUrlMethod' => 'getMenuUrl',
-            ),
-        );
-    }
+//    public function behaviors() {
+//        return array(
+//            'TreeBehavior' => array(
+//                'class' => 'ext.behaviors.XTreeBehavior',
+//                'treeLabelMethod' => 'getTreeLabel',
+//                'treeLabelMethod2' => 'getTreeLabel2',
+////                'menuUrlMethod' => 'getMenuUrl',
+//            ),
+//        );
+//    }
 
     public function getTreeLabel2() {
         return CHtml::link($this->userProfile->profDepartment->dept_name, Yii::app()->createAbsoluteUrl('site/default/index?userid='.$this->user_id));
@@ -186,7 +188,8 @@ class Users extends CActiveRecord {
     public function attributeLabels() {
         return array(
             'user_id' => 'User Mdl',
-            'parent_id' => 'Parent',
+            'parent_id' => 'Parent User',
+            'parent_dept_id' => 'Parent Dept',
             'user_name' => 'User Name',
             'user_email' => 'Email',
             'user_password' => 'User Password',

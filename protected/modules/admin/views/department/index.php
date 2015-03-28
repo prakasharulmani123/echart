@@ -11,6 +11,7 @@
                     <th>#</th>
                     <th>Department Name</th>
                     <th>Status</th>
+                    <th>Add / Edit Department Head</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -20,6 +21,12 @@
                         <td align="center"><?php echo $key + 1; ?></td>
                         <td align="center"><?php echo $department->dept_name ?></td>
                         <td align="center"><?php echo $department->status == '1' ? 'Active' : 'Inactive' ?></td>
+                        <td align="center">
+                            <?php
+                            $icon = $department->dept_head_user_id != 0 ? 'ui-icon-pencil' : 'ui-icon-circle-plus';
+                            echo CHtml::link('<button class="light icon_only div_icon narrow"><div class="ui-icon '.$icon.'"></div></button>', array('/admin/department/adduser', 'id' => $department->dept_id), array('id' => 'tooltip1')) . "&nbsp;&nbsp;";
+                            ?>
+                        </td>
                         <td align="center">
                             <?php
                             echo CHtml::link('<button class="light icon_only div_icon narrow"><div class="ui-icon ui-icon-search"></div></button>', array('/admin/department/view', 'id' => $department->dept_id), array('id' => 'tooltip1')) . "&nbsp;&nbsp;";
