@@ -1,40 +1,54 @@
 <?php
-if($deptid > 1){
+//Get Departments to show
+if ($deptid > 1) {
     $depts = Yii::app()->db->createCommand(
-                "SELECT GetDeptTree(dept_id) as depts
+                    "SELECT GetDeptTree(dept_id) as depts
                 FROM app_departmets
                 Where dept_id = '{$deptid}'")->queryRow();
 
-    $depts = "'".$deptid."','".str_replace(",", "','", $depts['depts'])."'";
+    $depts = "'" . $deptid . "','" . str_replace(",", "','", $depts['depts']) . "'";
     $departments = Department::model()->findAll("dept_id IN ({$depts}) And status = '1'");
-}else{
+} else {
     $departments = Department::model()->isActive()->findAll();
 }
-//echo '<pre>';
-//print_r($departments);
 
+//Get Staff count by Tree function
+$dept_tree = Yii::app()->db->createCommand(
+                "SELECT dept_id, dept_name, dept_head_user_id, GetDeptTree(dept_id) as tree
+                FROM app_departmets
+                HAVING GetDeptTree(dept_id) != ''")->queryAll();
+$dept_count = array();
+foreach ($dept_tree as $key => $tree) {
+    $trees = explode(',', $tree['tree']);
+    $users_count = 0;
+    foreach ($trees as $value) {
+        $users_count += UserProfile::model()->count('prof_department = :dept_id', array(':dept_id' => $value));
+    }
+    $users_count += UserProfile::model()->count('prof_department = :dept_id And user_id != :user_id', array(':dept_id' => $tree['dept_id'], ':user_id' => $tree['dept_head_user_id']));
+    $dept_count[$tree['dept_id']] = $users_count;
+}
 
+//Creating Parent keys for Chart Tree view
 $arrayDepartments = $deptKeys = array();
 foreach ($departments as $key => $department) {
-    if($department->childCount > 0){
+    if ($department->childCount > 0) {
         $deptKeys[$department->dept_id] = $department->dept_name;
     }
 }
-//echo '<pre>';
-//print_r($deptKeys);
 
 
-$unique_dept = $unique_users =array();
+$unique_dept = $head_users = array();
 $i = 1;
 $show_dept_without_users = false;
+//Generate Parent department First
 foreach ($departments as $key => $department) {
-    if($department->childCount > 0){
-        if(isset($department->deptHead->user_id) || $show_dept_without_users == true){
+    if ($department->childCount > 0) {
+        if (isset($department->deptHead->user_id) || $show_dept_without_users == true) {
             $key = array_search($department->dept_name, $deptKeys);
-            
-            if($deptid > 1){
+
+            if ($deptid > 1) {
                 $parentkey = $department->dept_id == $deptid ? 0 : array_search($department->deptParent->dept_name, $deptKeys);
-            }else{
+            } else {
                 $parentkey = array_search($department->deptParent->dept_name, $deptKeys);
             }
             $arrayDepartments[$key] = array(
@@ -47,39 +61,39 @@ foreach ($departments as $key => $department) {
                 'user_image' => isset($department->deptHead->user_prof_image) ? $department->deptHead->user_prof_image : '',
                 'user_phone' => isset($department->deptHead->userProfile->prof_mobile) ? $department->deptHead->userProfile->prof_mobile : '',
                 'user_email' => isset($department->deptHead->user_email) ? $department->deptHead->user_email : '',
+                'position_id' => isset($department->deptHead->userProfile->prof_position) ? $department->deptHead->userProfile->prof_position : '',
                 'dept_head' => true,
             );
-            if(isset($department->deptHead->userProfile->profPersonalStaff)){
+            if (isset($department->deptHead->userProfile->profPersonalStaff)) {
                 $assistant = $department->deptHead->userProfile->profPersonalStaff;
                 $arrayDepartments[$key]['assistant_id'] = $assistant->user_id;
                 $arrayDepartments[$key]['assistant_name'] = $assistant->userProfile->prof_firstname;
                 $arrayDepartments[$key]['assistant_image'] = $assistant->user_prof_image;
             }
-            array_push($unique_users, $department->deptHead->user_id);
+            array_push($head_users, $department->deptHead->user_id);
             $i++;
         }
     }
 }
-//echo '<pre>';
-//print_r($arrayDepartments);
 
-$arr_count = key(array_slice($arrayDepartments, -1, 1, TRUE))+1;
-foreach ($departments as $key => $department) {
-    if($department->childCount > 0){
-        if($department->dept_parent_id != 0){
-            if(empty($unique_dept) || !in_array($department->dept_parent_id, $unique_dept)){
-                $users = Users::model()->findAll('parent_dept_id = :parent_dept_id AND user_id != :user_id ', 
-                        array(
-                            ':parent_dept_id' => $department->dept_parent_id,
-                            ':user_id' => $department->dept_head_user_id != 0 ? $department->dept_head_user_id : '',
-                        ));
+if (!isset($_GET['organization'])) {
+    $department2 = $arrayDepartments;
+    $arr_count = key(array_slice($arrayDepartments, -1, 1, TRUE)) + 1;
+//Generate Childs departments for the parents
+    foreach ($department2 as $department) {
+        if ($department['org_parent_id'] != 0) {
+            if (empty($unique_dept) || !in_array($department['dept_id'], $unique_dept)) {
+                $users = Users::model()->findAll('parent_dept_id = :parent_dept_id AND user_id != :user_id ', array(
+                    ':parent_dept_id' => $department['dept_id'],
+                    ':user_id' => $department['user_id'] != 0 ? $department['user_id'] : '',
+                ));
 
                 foreach ($users as $key => $user) {
-                    if(!in_array($user->user_id, $unique_users)){
-                        $parentkey = array_search($department->deptParent->dept_name, $deptKeys);
+                    if (!in_array($user->user_id, $head_users)) {
+                        $parentkey = array_search($department['dept_name'], $deptKeys);
                         $arr_count++;
                         $arrayDepartments[$arr_count] = array(
-                            'org_parent_id' => $department->dept_parent_id,
+                            'org_parent_id' => $department['org_parent_id'],
                             'parent_id' => $parentkey,
                             'dept_id' => $user->userProfile->profDepartment->dept_id,
                             'dept_name' => $user->userProfile->profDepartment->dept_name,
@@ -88,8 +102,9 @@ foreach ($departments as $key => $department) {
                             'user_image' => $user->user_prof_image,
                             'user_phone' => $user->userProfile->prof_mobile,
                             'user_email' => $user->user_email,
+                            'position_id' => $user->userProfile->prof_position,
                         );
-                        if(isset($user->userProfile->profPersonalStaff)){
+                        if (isset($user->userProfile->profPersonalStaff)) {
                             $assistant = $user->userProfile->profPersonalStaff;
                             $arrayDepartments[$arr_count]['assistant_id'] = $assistant->user_id;
                             $arrayDepartments[$arr_count]['assistant_name'] = $assistant->userProfile->prof_firstname;
@@ -98,67 +113,72 @@ foreach ($departments as $key => $department) {
                     }
                 }
             }
-            array_push($unique_dept, $department->dept_parent_id);
+            array_push($unique_dept, $department['org_parent_id']);
         }
     }
 }
-//echo '<pre>';
-//print_r($arrayDepartments);
-//exit;
 
-function createDeptTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $topParent) {
+$managers_list = Position::model()->managersList();
+if($_GET['manager']){
+    foreach ($arrayDepartments as $key => $arrayDepartment) {
+        if(!in_array($arrayDepartment['position_id'], $managers_list)){
+            unset($arrayDepartments[$key]);
+        }
+    }
+}
+
+//Main function for create tree design
+function createDeptTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $topParent, $dept_count) {
     foreach ($array as $categoryId => $category) {
         if ($currentParent == $category['parent_id']) {
             if ($currLevel > $prevLevel) {
-                if ($topParent == 0) {
-                    echo '<ul id="organisation" class="display_none">';
-                } else {
-                    echo '<ul>';
-                }
+                echo $topParent == 0 ? '<ul id="organisation" class="display_none">' : '<ul>';
             }
             if ($currLevel == $prevLevel)
                 echo '</li>';
-            
+
             $label = "<li class='big'>";
             $label .= "<span id='orgainzeImage{$category['user_id']}'>";
-            if (!isset($_GET['organization'])) {
-                $label .= "<em>{$category['user_name']}</em><br>";
-            }
+            $label .=!isset($_GET['organization']) ? "<em>{$category['user_name']}</em><br>" : '';
             $label .= '<a class="dialog_button" data-dialog="prof_' . $category['user_id'] . '" href="javascript:popup(' . $category['user_id'] . ')">';
             $label .= '<img class="orgainzeImage" src="' . Yii::app()->createAbsoluteUrl('uploads/user/' . $category['user_image']) . '" title="' . $category['user_name'] . '" />';
             $label .= "</a>";
             $label .= "</span>";
             $label .= "<div class='orgDept'><p>{$category['dept_name']}</p></div>";
-            
-            $staff_count = '';
-            $ext_link = '';
-            if(isset($_GET['staff'])){
-                $ext_link .= '&staff=true';
-            }elseif(isset($_GET['organization'])){
-                $ext_link .= '&organization=true';
-            }elseif(isset($_GET['manager'])){
-                $ext_link .= '&manager=true';
+
+            $staff_count = 0;
+            if ($category['dept_id'] != $category['org_parent_id'] && isset($category['dept_head'])) {
+                $staff_count = $dept_count[$category['dept_id']];
             }
-            
-            $move_img = (/*$staff_count != '' && */$category['org_parent_id'] != '0') ? CHtml::link(
-                CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/navidown.gif')),
-                Yii::app()->createAbsoluteUrl('site/default/index?deptid='.$category['dept_id'].$ext_link), array('title' => 'Up in hierarchy')) : '';
-        
+
+            if (isset($_GET['staff']) && $_GET['staff'] == true && $staff_count > 0) {
+                $label .= '<div class="orgStaff"><p>' . $staff_count . '</p></div>';
+            }
+            $ext_link = '';
+            $ext_link .= isset($_GET['staff']) ? '&staff=true' : '';
+            $ext_link .= isset($_GET['organization']) ? '&organization=true' : '';
+            $ext_link .= isset($_GET['manager']) ? '&manager=true' : '';
+
+            $down_condition = $staff_count != 0 && $category['org_parent_id'] != '0';
+            $move_img = $down_condition ? CHtml::link(
+                            CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/navidown.gif')), Yii::app()->createAbsoluteUrl('site/default/index?deptid=' . $category['dept_id'] . $ext_link), array('title' => 'Up in hierarchy')
+                    ) : '';
+
+
             if (isset($_GET['deptid']) && $_GET['deptid'] != '') {
-                if($_GET['deptid'] == $category['user_id'] && $category['org_parent_id'] != '0'){
+                if ($_GET['deptid'] == $category['dept_id'] && $category['org_parent_id'] != '0' && isset($category['dept_head'])) {
                     $move_img = CHtml::link(
-                            CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/naviup.gif')),
-                            Yii::app()->createAbsoluteUrl('site/default/index?deptid='.$category['org_parent_id'].$ext_link), array('title' => 'Down in hierarchy'));
+                                    CHtml::image(Yii::app()->createAbsoluteUrl('themes/site/images/interface/naviup.gif')), Yii::app()->createAbsoluteUrl('site/default/index?deptid=' . $category['org_parent_id'] . $ext_link), array('title' => 'Down in hierarchy'));
                 }
             }
 
-            if(!isset($_GET['staff'])){
+            if (!isset($_GET['staff'])) {
                 $label .= $category['user_phone'] != '' ? "<div class='orgPhone'><p>{$category['user_phone']}</p></div>" : '';
                 $label .= $category['user_email'] != '' ? "<div class='orgEmail'><p>{$category['user_email']}</p></div>" : '';
-                $label .= '<div class="hire_img">'.$move_img. '</div>';
+                $label .= '<div class="hire_img">' . $move_img . '</div>';
             }
-            
-            if (isset($category['assistant_name']) && !isset($_GET['organization']) /*&& $organize_chart == true*/) {
+
+            if (isset($category['assistant_name']) && !isset($_GET['organization']) /* && $organize_chart == true */) {
                 $img_path = Yii::app()->createAbsoluteUrl('uploads/user/' . $category['assistant_image']);
                 $label .= '<adjunct>' . '<span id="orgainzeImage' . $category['assistant_id'] . '"><a href="javascript:popup(' . $category['assistant_id'] . ')">';
                 $label .= "<img src='{$img_path}' class='orgainzeImage' />";
@@ -171,7 +191,7 @@ function createDeptTree($array, $currentParent, $currLevel = 0, $prevLevel = -1,
                 $prevLevel = $currLevel;
             }
             $currLevel++;
-            createDeptTree($array, $categoryId, $currLevel, $prevLevel, 1);
+            createDeptTree($array, $categoryId, $currLevel, $prevLevel, 1, $dept_count);
             $currLevel--;
         }
     }
@@ -180,8 +200,8 @@ function createDeptTree($array, $currentParent, $currLevel = 0, $prevLevel = -1,
 }
 ?>
 <div class="flat_area grid_16">
-    <?php createDeptTree($arrayDepartments, 0, 0, -1, 0);?>
-    <?php // createDeptTree($arrayDepartments, 2, 2, 1, 0);?>
+    <?php createDeptTree($arrayDepartments, 0, 0, -1, 0, $dept_count); ?>
+    <?php // createDeptTree($arrayDepartments, 2, 2, 1, 0); ?>
     <div id="orgChart"></div>
 </div>
 
@@ -205,7 +225,8 @@ $js = <<< EOD
     $(".adjunct").removeClass("big");
 EOD;
 $users = Users::model()->with('userProfile')->isActive()->findAll();
-foreach ($users as $key => $user) { ?>
+foreach ($users as $key => $user) {
+    ?>
     <div class="display_none">
         <a id="a_prof_<?php echo $user->user_id ?>" class="dialog_button" href="javascript:void(0)" id data-dialog="prof_<?php echo $user->user_id ?>">Pop up</a>
         <div id="prof_<?php echo $user->user_id ?>" class="dialog_content" title="<?= $user->userProfile->prof_firstname ?> Profile">
@@ -408,9 +429,9 @@ foreach ($users as $key => $user) { ?>
         </div>
     </div>
     </div>
-<?php
-$img = CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), '',array('width'=>'50', 'height' => '50', 'style' => 'margin-left:70px;'));
-$js .= <<< EOD
+    <?php
+    $img = CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), '', array('width' => '50', 'height' => '50', 'style' => 'margin-left:70px;'));
+    $js .= <<< EOD
     $('h2 #orgainzeImage$user->user_id').tooltipster({
             content: $('$img<p style="text-align:center;"><b>$firstname</b></p><br /><p style="text-align:center;">$position</p><p style="text-align:center">$dept</p><p style="text-align:center">$phone</p>'),
             // setting a same value to minWidth and maxWidth will result in a fixed width
@@ -434,9 +455,4 @@ Yii::app()->clientScript->registerScript('organisation', $js);
     div.orgChart div.node.big {
         height: auto;
     }
-<?php if (isset($_GET['staff'])) { ?>
-/*    div.orgChart div.node.big {
-        height: 83px;
-    }*/
-<?php } ?>
 </style>

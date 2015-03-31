@@ -106,7 +106,7 @@ class UserController extends Controller {
             if ($valid) {
                 $model->save(false);
                 $profModel->save(false);
-                Yii::app()->user->setFlash('success', 'user account has been updated Successfully');
+                Yii::app()->user->setFlash('green', 'user account has been updated Successfully');
                 $this->redirect(array('index'));
             }
         }
@@ -126,7 +126,7 @@ class UserController extends Controller {
             throw new CHttpException(404, 'The requested page does not exist.');
 
         $user->delete();
-        Yii::app()->user->setFlash('success', 'You have deleted successfully');
+        Yii::app()->user->setFlash('green', 'You have deleted successfully');
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
         if (!isset($_GET['ajax']))
             $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));
@@ -207,7 +207,7 @@ class UserController extends Controller {
             Entry::model()->deleteAll("temp_activation_key = '$user->user_activation_key'");
 
             if ($user->delete()) {
-                $return['sts'] = 'success';
+                $return['sts'] = 'green';
                 $return['text'] = 'Selected Users deleted successfully';
             } else {
                 $return['sts'] = 'fail';

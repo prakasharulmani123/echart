@@ -1,10 +1,10 @@
 <?php
 $users = CHtml::listData(Users::model()->with('userProfile')->isActive()->isNotAssistnant()->findAll(), 'user_id', 'userProfile.prof_firstname');
-$companies = CHtml::listData(Company::model()->isActive()->findAll(), 'company_id', 'company_name');
-$sites = CHtml::listData(Site::model()->isActive()->findAll(), 'site_id', 'site_name');
-$secratey = CHtml::listData(Users::model()->isActive()->isAssistnant()->findAll(), 'user_id', 'user_name');
-$departments = CHtml::listData(Department::model()->isActive()->findAll(), 'dept_id', 'dept_name');
-$positions = CHtml::listData(Position::model()->isActive()->findAll(), 'position_id', 'position_name');
+$companies = CHtml::listData(Company::model()->isActive()->findAll(array('order' => 'company_name asc')), 'company_id', 'company_name');
+$sites = CHtml::listData(Site::model()->isActive()->findAll(array('order' => 'site_name asc')), 'site_id', 'site_name');
+$secratey = CHtml::listData(Users::model()->isActive()->isAssistnant()->findAll(array('order' => 'user_name asc')), 'user_id', 'user_name');
+$departments = CHtml::listData(Department::model()->isActive()->findAll(array('order' => 'dept_name asc')), 'dept_id', 'dept_name');
+$positions = CHtml::listData(Position::model()->isActive()->findAll(array('order' => 'position_name asc')), 'position_id', 'position_name');
 
 $GLOBALS['assist'] = UserProfile::getAssitants();
 
