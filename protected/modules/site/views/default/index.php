@@ -79,7 +79,7 @@ foreach ($departments as $key => $department) {
 if (!isset($_GET['organization'])) {
     $department2 = $arrayDepartments;
     $arr_count = key(array_slice($arrayDepartments, -1, 1, TRUE)) + 1;
-//Generate Childs departments for the parents
+    //Generate Childs departments for the parents
     foreach ($department2 as $department) {
         if ($department['org_parent_id'] != 0) {
             if (empty($unique_dept) || !in_array($department['dept_id'], $unique_dept)) {
@@ -113,11 +113,12 @@ if (!isset($_GET['organization'])) {
                     }
                 }
             }
-            array_push($unique_dept, $department['org_parent_id']);
+            array_push($unique_dept, $department['dept_id']);
         }
     }
 }
 
+//Manager Filters
 $managers_list = Position::model()->managersList();
 if($_GET['manager']){
     foreach ($arrayDepartments as $key => $arrayDepartment) {

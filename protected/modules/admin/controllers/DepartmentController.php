@@ -154,9 +154,9 @@ class DepartmentController extends Controller {
                     $user_model = Users::model()->findByPk($model->dept_head_user_id);
                     $user_model->parent_dept_id = $model->dept_parent_id;
                     $user_model->save();
-                    Yii::app()->user->setFlash('green', 'Successfully Updated');
-                    $this->redirect(array('index'));
                 }
+                Yii::app()->user->setFlash('green', 'Successfully Updated');
+                $this->redirect(array('index'));
             }
         }
 
