@@ -64,8 +64,73 @@
     </div>
 </div>
 
+<?php 
+$departments = Department::model()->isActive()->findAll();
+$users = Users::model()->isActive()->findAll();
+$arrayDepartments = array();
+//Creating Parent keys for Chart Tree view
+$arrayDepartments = $deptKeys = array();
+foreach ($departments as $key => $department) {
+    if ($department->childCount > 0) {
+        $deptKeys[$department->dept_id] = $department->dept_name;
+    }
+}
+
+$show_dept_without_users = false;
+foreach ($departments as $key => $department) {
+    if ($department->childCount > 0) {
+        if (isset($department->deptHead->user_id) || $show_dept_without_users == true) {
+            $key = array_search($department->dept_name, $deptKeys);
+
+            if ($deptid > 1) {
+                $parentkey = $department->dept_id == $deptid ? 0 : array_search($department->deptParent->dept_name, $deptKeys);
+            } else {
+                $parentkey = array_search($department->deptParent->dept_name, $deptKeys);
+            }
+            $arrayDepartments[$key] = array(
+                'org_parent_id' => $department->dept_parent_id,
+                'parent_id' => $parentkey != '' ? $parentkey : 0,
+                'dept_id' => $department->dept_id,
+                'dept_name' => $department->dept_name,
+                'user_id' => isset($department->deptHead->user_id) ? $department->deptHead->user_id : '',
+                'head_name' => isset($department->deptHead->userProfile->prof_firstname) ? $department->deptHead->userProfile->prof_firstname : '',
+            );
+        }
+    }
+}
+
+function createStructureTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $topParent) {
+    foreach ($array as $categoryId => $category) {
+        if ($currentParent == $category['parent_id']) {
+            $op_cl = 'closed';
+            if ($currLevel > $prevLevel) {
+                if ($topParent == 0) {
+                    echo '<ul id="structure" class="filetree">';
+                    $op_cl = 'open';
+                } else {
+                    echo '<ul>';
+                }
+            }
+            if ($currLevel == $prevLevel)
+                echo '</li>';
+
+            echo '<li class="' . $op_cl . '">' . '<span class="folder">' . $category['dept_name'] . '</span>';
+            if ($currLevel > $prevLevel) {
+                $prevLevel = $currLevel;
+            }
+            $currLevel++;
+            createStructureTree($array, $categoryId, $currLevel, $prevLevel, 1);
+            $currLevel--;
+        }
+    }
+    if ($currLevel == $prevLevel)
+        echo ' </li>  </ul> ';
+}
+s?>
 <div class="display_none">
     <div id="go_structure" class="dialog_content" title="Go to structure">
+        <?php createStructureTree($arrayDepartments, 0, 0, -1, 0); ?>
+
          <?php
 //                    $this->widget('CTreeView', array(
 //                        'id' => 'structure',
@@ -89,5 +154,5 @@ $js = <<< EOD
 EOD;
 Yii::app()->clientScript->coreScriptPosition = CClientScript::POS_END;
 Yii::app()->clientScript->registerScript('sidebarnav', $js);
+Yii::app()->clientScript->registerScript('explore', $js);
 ?>
-

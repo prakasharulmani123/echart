@@ -38,7 +38,6 @@ foreach ($departments as $key => $department) {
 
 
 $unique_dept = $head_users = array();
-$i = 1;
 $show_dept_without_users = false;
 //Generate Parent department First
 foreach ($departments as $key => $department) {
@@ -71,7 +70,6 @@ foreach ($departments as $key => $department) {
                 $arrayDepartments[$key]['assistant_image'] = $assistant->user_prof_image;
             }
             array_push($head_users, $department->deptHead->user_id);
-            $i++;
         }
     }
 }

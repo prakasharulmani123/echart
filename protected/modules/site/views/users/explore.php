@@ -1,26 +1,42 @@
 <?php
-$dist_parents = Users::model()->isActive()->findAll(array('select' => 't.parent_id', 'distinct' => true, 'order' => 't.parent_id asc'));
+$departments = Department::model()->isActive()->findAll();
 $users = Users::model()->isActive()->findAll();
-$arrayUsers = array();
-$assist = explode(',', UserProfile::getAssitants());
-$departments = array();
+$arrayDepartments = array();
+//Creating Parent keys for Chart Tree view
+$arrayDepartments = $deptKeys = array();
+foreach ($departments as $key => $department) {
+    if ($department->childCount > 0) {
+        $deptKeys[$department->dept_id] = $department->dept_name;
+    }
+}
 
-foreach ($users as $key => $user) {
-    if (!in_array($user->user_id, $assist)) {
-        $assistant = '';
-        if ($user->userProfile->prof_personal_staff != '0') {
-            $assistant = $user->userProfile->profPersonalStaff->userProfile->prof_firstname;
+$show_dept_without_users = false;
+foreach ($departments as $key => $department) {
+    if ($department->childCount > 0) {
+        if (isset($department->deptHead->user_id) || $show_dept_without_users == true) {
+            $key = array_search($department->dept_name, $deptKeys);
+
+            if ($deptid > 1) {
+                $parentkey = $department->dept_id == $deptid ? 0 : array_search($department->deptParent->dept_name, $deptKeys);
+            } else {
+                $parentkey = array_search($department->deptParent->dept_name, $deptKeys);
+            }
+            $arrayDepartments[$key] = array(
+                'org_parent_id' => $department->dept_parent_id,
+                'parent_id' => $parentkey != '' ? $parentkey : 0,
+                'dept_id' => $department->dept_id,
+                'dept_name' => $department->dept_name,
+                'user_id' => isset($department->deptHead->user_id) ? $department->deptHead->user_id : '',
+                'head_name' => isset($department->deptHead->userProfile->prof_firstname) ? $department->deptHead->userProfile->prof_firstname : '',
+            );
+            if (isset($department->deptHead->userProfile->profPersonalStaff)) {
+                $assistant = $department->deptHead->userProfile->profPersonalStaff;
+                $arrayDepartments[$key]['assistant_id'] = $assistant->user_id;
+                $arrayDepartments[$key]['assistant'] = $assistant->userProfile->prof_firstname;
+            }
+            $child_users = CHtml::listData(Users::model()->with('userProfile')->findAll('parent_dept_id = :dept_id', array(':dept_id' => $department->dept_id)), 'user_id', 'userProfile.prof_firstname');
+            $arrayDepartments[$key]['child_users'] = !empty($child_users) ? $child_users : array();
         }
-
-        $arrayUsers[$key + 1] = array(
-            'parent_id' => $user->parent_id,
-            'user_id' => $user->user_id,
-            'name' => $user->userProfile->prof_firstname,
-            'image' => $user->user_prof_image,
-            'department' => $user->userProfile->profDepartment->dept_name,
-            'assistant_id' => $user->userProfile->prof_personal_staff,
-            'assistant' => $assistant,
-        );
     }
 }
 
@@ -39,10 +55,15 @@ function createTree($array, $currentParent, $currLevel = 0, $prevLevel = -1, $to
             if ($currLevel == $prevLevel)
                 echo '</li>';
 
-            $sub_content = '<ul><li>' . '<span id="exp_user' . $category['user_id'] . '" class="manager"><a class="dialog_button" href="javascript:popup(' . $category['user_id'] . ')" data-dialog="prof_' . $category['user_id'] . '">' . $category['name'] . '</a></span></li></ul>';
+            $sub_content = '<ul><li>' . '<span id="exp_user' . $category['user_id'] . '" class="manager"><a href="javascript:popup(' . $category['user_id'] . ')" data-dialog="prof_' . $category['user_id'] . '">' . $category['head_name'] . '</a></span></li></ul>';
             $sub_content .= $category['assistant'] == '' ? '' : '<ul><li><span id="exp_user' . $category['assistant_id'] . '" class="assistant">' . '<a href="javascript:popup(' . $category['assistant_id'] . ')">' . $category['assistant'] . '</a></span></li></ul>';
+            if(!empty($category['child_users'])){
+                foreach ($category['child_users'] as $child_id => $child) {
+                    $sub_content .= '<ul><li><span id="exp_user' . $child_id . '" class="assistant">' . '<a href="javascript:popup(' . $child_id . ')">' . $child . '</a></span></li></ul>';
+                }
+            }
 
-            echo '<li class="' . $op_cl . '">' . '<span class="folder">' . $category['department'] . '</span>' . $sub_content;
+            echo '<li class="' . $op_cl . '">' . '<span class="folder">' . $category['dept_name'] . '</span>' . $sub_content;
             if ($currLevel > $prevLevel) {
                 $prevLevel = $currLevel;
             }
@@ -69,7 +90,7 @@ EOD;
             <div class="columns clearfix">
                 <div class="col_100 no_border_top">
                     <div class="section">
-                        <?php createTree($arrayUsers, 0, 0, -1, 0); ?>
+                        <?php createTree($arrayDepartments, 0, 0, -1, 0); ?>
                     </div>
                 </div>
             </div>
