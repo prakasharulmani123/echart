@@ -12,6 +12,7 @@
                     <th><?php echo Users::model()->getAttributeLabel('user_name')?></th>
                     <th><?php echo Users::model()->getAttributeLabel('user_email')?></th>
                     <th><?php echo UserProfile::model()->getAttributeLabel('prof_department')?></th>
+                    <th>Is Head</th>
                     <th><?php echo Users::model()->getAttributeLabel('user_status')?></th>
                     <th>Action</th>
                 </tr>
@@ -23,6 +24,12 @@
                         <td align="center"><?php echo $user->user_name ?></td>
                         <td align="center"><?php echo $user->user_email ?></td>
                         <td align="center"><?php echo $user->userProfile->profDepartment->dept_name; ?></td>
+                        <td align="center">
+                            <?php
+                            $check_is_head = Department::model()->count('dept_head_user_id = :user_id', array(':user_id' => $user->user_id));
+                            echo $check_is_head > 0 ? '<div class="ui-icon ui-icon-check"></div>' : '<div class="ui-icon ui-icon-close"></div>';
+                            ?>
+                        </td>
                         <td align="center"><?php echo Myclass::getStatus($user->user_status) ?></td>
                         <td align="center">
                             <?php
