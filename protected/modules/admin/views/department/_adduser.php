@@ -1,5 +1,5 @@
 <?php
-$users = CHtml::listData(Users::model()->with('userProfile')->isActive()->isNotAssistnant()->findAll(), 'user_id', 'userProfile.prof_firstname');
+$users = CHtml::listData(Users::model()->with('userProfile')->isActive()->isNotAssistnant()->findAll(array('order' => 'userProfile.prof_firstname ASC')), 'user_id', 'userProfile.prof_firstname');
 
 $form = $this->beginWidget('CActiveForm', array(
     'id' => 'Department-form',
