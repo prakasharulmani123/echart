@@ -10,6 +10,7 @@
                 <tr>
                     <th>#</th>
                     <th>Department Name</th>
+                    <th>Parent</th>
                     <th>Status</th>
                     <th>Add / Edit Department Head</th>
                     <th>Visible in Hierarchy</th>
@@ -21,6 +22,7 @@
                     <tr>
                         <td align="center"><?php echo $key + 1; ?></td>
                         <td align="center"><?php echo $department->dept_name ?></td>
+                        <td align="center"><?php echo $department->deptParent->dept_name ?></td>
                         <td align="center"><?php echo $department->status == '1' ? 'Active' : 'Inactive' ?></td>
                         <td align="center">
                             <?php
