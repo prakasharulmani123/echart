@@ -1,7 +1,8 @@
 $(document).ready(function(){
 	
 	// first example
-	$("#browser").treeview();
+//	$("#browser").treeview();
+	$(".filetree").treeview();
 	
 	// second example
 	$("#navigation").treeview({

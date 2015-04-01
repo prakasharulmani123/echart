@@ -12,7 +12,7 @@ class DepartmentController extends Controller {
     public function filters() {
         return array(
             'accessControl', // perform access control for CRUD operations
-            'postOnly + delete', // we only allow deletion via POST request
+//            'postOnly + delete', // we only allow deletion via POST request
         );
     }
 
@@ -96,7 +96,29 @@ class DepartmentController extends Controller {
      * @param integer $id the ID of the model to be deleted
      */
     public function actionDelete($id) {
-        $this->loadModel($id)->delete();
+        $department = $this->loadModel($id);
+        
+        $depts = Yii::app()->db->createCommand(
+                "SELECT GetDeptTree(dept_id) as depts
+            FROM app_departmets
+            Where dept_id = '{$id}'")->queryRow();
+        
+        $depts = $depts['depts'] != '' ? explode(',', $depts['depts']) : array();
+        $dept_count = count($depts);
+        
+        if($dept_count > 0){
+            Yii::app()->user->setFlash('red', "This department have {$dept_count} child departments. Can't delete this department");
+            $this->redirect(array("department/index"));
+        }else{
+            $user_count = UserProfile::model()->count("prof_department = :dept", array(':dept' => $id));
+            $user_count += Users::model()->count("parent_dept_id = :dept", array(':dept' => $id));
+            
+            if($user_count > 0){
+                Yii::app()->user->setFlash('red', "This department have {$user_count} Users. Can't delete this department");
+                $this->redirect(array("department/index"));
+            }
+        }
+        $department->delete();
 
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
         if (!isset($_GET['ajax'])) {

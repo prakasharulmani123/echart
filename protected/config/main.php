@@ -60,7 +60,7 @@ return array(
         // database settings are configured in database.php
         'db' => require(dirname(__FILE__) . '/database.php'),
         'errorHandler' => array(
-            'errorAction' => 'site/error',
+            'errorAction' => 'site/default/error',
         ),
         'log' => array(
             'class' => 'CLogRouter',

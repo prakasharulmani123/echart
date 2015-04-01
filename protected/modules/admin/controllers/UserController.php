@@ -53,7 +53,7 @@ class UserController extends Controller {
         $model->setScenario('create');
         $profModel = new UserProfile();
         // Uncomment the following line if AJAX validation is needed
-         $this->performAjaxValidation($model);
+        $this->performAjaxValidation($model);
         if (isset($_POST['Users'])) {
             $model->attributes = $_POST['Users'];
             $model->setAttribute('parent_id', $_POST['Users']['parent_id']);
@@ -97,6 +97,17 @@ class UserController extends Controller {
         $profModel = UserProfile::model()->find("user_id = '$id'");
 
         if (isset($_POST['Users'])) {
+            $check_is_head = Department::model()->find('dept_head_user_id = :user_id', array(':user_id' => $model->user_id));
+            if (!empty($check_is_head)) {
+                if ($_POST['Users']['parent_dept_id'] == '' || $model->parent_dept_id != $_POST['Users']['parent_dept_id']) {
+                    $message = "You can't change Head User. Please remove the user from Department Head<br />";
+                    $link = CHtml::link('link', array('/admin/department/adduser/id/' . $check_is_head->dept_id));
+                    $message .= "Click Here this {$link} to remove this user from Head department<br />";
+                    Yii::app()->user->setFlash('red', $message);
+                    $this->redirect(array("user/update/id/{$model->user_id}"));
+                }
+            }
+
             $model->attributes = $_POST['Users'];
             $model->setAttribute('parent_id', $_POST['Users']['parent_id']);
             $profModel->attributes = $_POST['UserProfile'];
@@ -121,7 +132,15 @@ class UserController extends Controller {
      */
     public function actionDelete($id) {
         $user = $this->loadModel($id);
-
+        $check_is_head = Department::model()->find('dept_head_user_id = :user_id', array(':user_id' => $user->user_id));
+        if (array($check_is_head)) {
+            $message = "You can't delete Head User. Please remove the user from Department Head<br />";
+            $link = CHtml::link('link', array('/admin/department/adduser/id/' . $check_is_head->dept_id));
+            $message .= "Click Here this {$link} to remove this user from Head department<br />";
+            Yii::app()->user->setFlash('red', $message);
+            $this->redirect(array("user/index"));
+        }
+        exit;
         if (empty($user))
             throw new CHttpException(404, 'The requested page does not exist.');
 

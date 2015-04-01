@@ -9,7 +9,7 @@
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Find</span>', 'url' => $this->createUrl('/site/users/find')),
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Print</span>', 'url' => $this->createUrl('/site/default/print')),
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Go to structure</span>', 'url' => '#', 'linkOptions' => array('class' => 'dialog_button', 'data-dialog' => 'go_structure')),
-            array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Explore Structure</span>', 'url' => $this->createUrl('/site/users/explore')),
+            array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Explorer Style</span>', 'url' => $this->createUrl('/site/users/explore')),
             array('label' => CHtml::image("$this->themeUrl/images/icons/small/grey/frames.png") . '<span>Options</span>', 'url' => '#',
                 'itemOptions' => array('class' => 'sub-menu'),
                 'submenuOptions' => array('class' => 'sub'),
@@ -44,6 +44,7 @@
     ?>
 
     <?php
+
     if (!Yii::app()->user->isGuest):
         $this->widget('zii.widgets.CMenu', array(
             'htmlOptions' => array('class' => 'send_right'),
@@ -64,9 +65,8 @@
     </div>
 </div>
 
-<?php 
+<?php
 $departments = Department::model()->isActive()->findAll();
-$users = Users::model()->isActive()->findAll();
 $arrayDepartments = array();
 //Creating Parent keys for Chart Tree view
 $arrayDepartments = $deptKeys = array();
@@ -95,6 +95,13 @@ foreach ($departments as $key => $department) {
                 'user_id' => isset($department->deptHead->user_id) ? $department->deptHead->user_id : '',
                 'head_name' => isset($department->deptHead->userProfile->prof_firstname) ? $department->deptHead->userProfile->prof_firstname : '',
             );
+            if (isset($department->deptHead->userProfile->profPersonalStaff)) {
+                $assistant = $department->deptHead->userProfile->profPersonalStaff;
+                $arrayDepartments[$key]['assistant_id'] = $assistant->user_id;
+                $arrayDepartments[$key]['assistant'] = $assistant->userProfile->prof_firstname;
+            }
+            $child_users = CHtml::listData(Users::model()->with('userProfile')->findAll('parent_dept_id = :dept_id', array(':dept_id' => $department->dept_id)), 'user_id', 'userProfile.prof_firstname');
+            $arrayDepartments[$key]['child_users'] = !empty($child_users) ? $child_users : array();
         }
     }
 }
@@ -105,7 +112,7 @@ function createStructureTree($array, $currentParent, $currLevel = 0, $prevLevel 
             $op_cl = 'closed';
             if ($currLevel > $prevLevel) {
                 if ($topParent == 0) {
-                    echo '<ul id="structure" class="filetree">';
+                    echo '<ul class="filetree">';
                     $op_cl = 'open';
                 } else {
                     echo '<ul>';
@@ -114,7 +121,8 @@ function createStructureTree($array, $currentParent, $currLevel = 0, $prevLevel 
             if ($currLevel == $prevLevel)
                 echo '</li>';
 
-            echo '<li class="' . $op_cl . '">' . '<span class="folder">' . $category['dept_name'] . '</span>';
+            $link = CHtml::link($category['dept_name'], Yii::app()->createAbsoluteUrl('site/default/index?deptid=' . $category['dept_id'] . $ext_link), array('title' => $category['dept_name']));
+            echo '<li class="' . $op_cl . '">' . '<span class="folder">' . $link . '</span>';
             if ($currLevel > $prevLevel) {
                 $prevLevel = $currLevel;
             }
@@ -126,11 +134,33 @@ function createStructureTree($array, $currentParent, $currLevel = 0, $prevLevel 
     if ($currLevel == $prevLevel)
         echo ' </li>  </ul> ';
 }
-s?>
+
+$js = <<< EOD
+    $(".dialog_button").on("click", function(){
+        $("#a_prof_"+$(this).data("dialog")).trigger("click");
+    });
+EOD;
+?>
+
+<script type="text/javascript">
+    function popup(value) {
+        $("#a_prof_" + value).trigger("click");
+    }
+</script>
+<?php
+Yii::app()->clientScript->coreScriptPosition = CClientScript::POS_END;
+Yii::app()->clientScript->registerScript('_sidebar', $js);
+?>
+
+<style type="text/css">
+    .ui-tabs-hide{
+        display: none !important;
+    }
+</style>
+
 <div class="display_none">
     <div id="go_structure" class="dialog_content" title="Go to structure">
         <?php createStructureTree($arrayDepartments, 0, 0, -1, 0); ?>
-
          <?php
 //                    $this->widget('CTreeView', array(
 //                        'id' => 'structure',
@@ -145,14 +175,3 @@ s?>
                 ?>
     </div>
 </div>
-
-<?php
-$js = <<< EOD
-    $(".dialog_button").on("click", function(){
-        $("#a_prof_"+$(this).data("dialog")).trigger("click");
-    });
-EOD;
-Yii::app()->clientScript->coreScriptPosition = CClientScript::POS_END;
-Yii::app()->clientScript->registerScript('sidebarnav', $js);
-Yii::app()->clientScript->registerScript('explore', $js);
-?>

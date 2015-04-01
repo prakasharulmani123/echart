@@ -174,8 +174,8 @@ function createDeptTree($array, $currentParent, $currLevel = 0, $prevLevel = -1,
             if (!isset($_GET['staff'])) {
                 $label .= $category['user_phone'] != '' ? "<div class='orgPhone'><p>{$category['user_phone']}</p></div>" : '';
                 $label .= $category['user_email'] != '' ? "<div class='orgEmail'><p>{$category['user_email']}</p></div>" : '';
-                $label .= '<div class="hire_img">' . $move_img . '</div>';
             }
+            $label .= '<div class="hire_img">' . $move_img . '</div>';
 
             if (isset($category['assistant_name']) && !isset($_GET['organization']) /* && $organize_chart == true */) {
                 $img_path = Yii::app()->createAbsoluteUrl('uploads/user/' . $category['assistant_image']);
@@ -447,10 +447,6 @@ Yii::app()->clientScript->registerScript('organisation', $js);
 ?>
 
 <style type="text/css">
-    .ui-tabs-hide{
-        display: none !important;
-    }
-
     div.orgChart div.node.big {
         height: auto;
     }

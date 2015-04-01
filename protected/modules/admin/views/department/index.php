@@ -12,6 +12,7 @@
                     <th>Department Name</th>
                     <th>Status</th>
                     <th>Add / Edit Department Head</th>
+                    <th>Visible in Hierarchy</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -25,6 +26,11 @@
                             <?php
                             $icon = $department->dept_head_user_id != 0 ? 'ui-icon-pencil' : 'ui-icon-circle-plus';
                             echo CHtml::link('<button class="light icon_only div_icon narrow"><div class="ui-icon '.$icon.'"></div></button>', array('/admin/department/adduser', 'id' => $department->dept_id), array('id' => 'tooltip1')) . "&nbsp;&nbsp;";
+                            ?>
+                        </td>
+                        <td align="center">
+                            <?php
+                            echo $department->dept_head_user_id != 0 ? '<div class="ui-icon ui-icon-check"></div>' : '<div class="ui-icon ui-icon-close"></div>';
                             ?>
                         </td>
                         <td align="center">

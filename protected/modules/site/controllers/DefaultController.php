@@ -103,5 +103,15 @@ class DefaultController extends Controller {
             Yii::app()->end();
         }
     }
+    
+    public function actionError() {
+        if ($error = Yii::app()->errorHandler->error) {
+            $name = Yii::app()->errorHandler->error['code'] . ' Error';
+            if (Yii::app()->request->isAjaxRequest)
+                echo $error['message'];
+            else
+                $this->render('error', compact('error', 'name'));
+        }
+    }
 
 }

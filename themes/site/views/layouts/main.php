@@ -31,6 +31,7 @@
         $cs->registerCssFile($this->themeUrl . '/styles/plugins/organizechart/jquery.orgchart.css');
         
         $cs->registerCssFile($this->themeUrl . '/styles/plugins/treeview/jquery.treeview.css');
+        $cs->registerCssFile($this->themeUrl . '/styles/plugins/treeview/_styles.css');
         
         $cs->registerCssFile($this->themeUrl . '/styles/plugins/tooltip/tooltipster.css');
         $cs->registerCssFile($this->themeUrl . '/styles/plugins/tooltip/themes/tooltipster-light.css');
