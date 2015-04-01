@@ -90,3 +90,7 @@ input.error{
   font-family: arial;
   font-style: normal;
 }
+
+#go_structure{
+    padding: 10px;
+}
