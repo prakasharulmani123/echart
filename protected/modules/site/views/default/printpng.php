@@ -315,6 +315,10 @@ EOD;
             div.orgChart div.node.big {
                 height: auto;
             }
+            
+            #toTop{
+                display: none;
+            }
         </style>
 
     </body>
