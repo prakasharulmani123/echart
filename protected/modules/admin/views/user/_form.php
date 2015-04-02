@@ -259,6 +259,7 @@ $form = $this->beginWidget('CActiveForm', array(
 <?php $this->endWidget(); ?>
 
 <?php
+$url = Yii::app()->baseUrl.'/admin/department/getchilds';
 $js = <<< EOD
         $(document).ready(function(){
             if($("#Users_is_personal_staff").val() == '0'){
@@ -277,6 +278,27 @@ $js = <<< EOD
                     $(".personal_staff_field").hide();
                     $(".parent_field").show();
                 }
+            });
+        
+            $("#Users_parent_dept_id").on("change", function(){
+                var _that = $(this);
+                 $.ajax({
+                    type: "POST",
+                    data: {parent_id: _that.val()},
+                    url: "$url", 
+                    success: function(result){
+                        $('#UserProfile_prof_department').find('option:not(:first)').remove();
+                        var obj = jQuery.parseJSON(result);
+                        $.each(obj, function(key,value) {
+                            $('#UserProfile_prof_department').append('<option value="'+key+'">'+value+'</option>');
+                        });
+                        $('#UserProfile_prof_department').val(_that.val());
+                        $.uniform.update("#UserProfile_prof_department");
+
+//                        $('#UserProfile_prof_department').empty();
+//                        $('#UserProfile_prof_department').val("");
+                    }
+                });
             });
         });
 EOD;

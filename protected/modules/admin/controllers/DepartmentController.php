@@ -24,7 +24,7 @@ class DepartmentController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('index', 'view', 'create', 'update', 'delete', 'adduser'),
+                'actions' => array('index', 'view', 'create', 'update', 'delete', 'adduser', 'getchilds'),
                 'users' => array('@'),
             ),
             array('deny', // deny all users
@@ -97,23 +97,23 @@ class DepartmentController extends Controller {
      */
     public function actionDelete($id) {
         $department = $this->loadModel($id);
-        
+
         $depts = Yii::app()->db->createCommand(
-                "SELECT GetDeptTree(dept_id) as depts
+                        "SELECT GetDeptTree(dept_id) as depts
             FROM app_departmets
             Where dept_id = '{$id}'")->queryRow();
-        
+
         $depts = $depts['depts'] != '' ? explode(',', $depts['depts']) : array();
         $dept_count = count($depts);
-        
-        if($dept_count > 0){
+
+        if ($dept_count > 0) {
             Yii::app()->user->setFlash('red', "This department have {$dept_count} child departments. Can't delete this department");
             $this->redirect(array("department/index"));
-        }else{
+        } else {
             $user_count = UserProfile::model()->count("prof_department = :dept", array(':dept' => $id));
             $user_count += Users::model()->count("parent_dept_id = :dept", array(':dept' => $id));
-            
-            if($user_count > 0){
+
+            if ($user_count > 0) {
                 Yii::app()->user->setFlash('red', "This department have {$user_count} Users. Can't delete this department");
                 $this->redirect(array("department/index"));
             }
@@ -162,7 +162,7 @@ class DepartmentController extends Controller {
             Yii::app()->end();
         }
     }
-    
+
     public function actionAdduser($id) {
         $model = $this->loadModel($id);
 
@@ -172,7 +172,7 @@ class DepartmentController extends Controller {
         if (isset($_POST['Department'])) {
             $model->attributes = $_POST['Department'];
             if ($model->save()) {
-                if($model->dept_head_user_id != ''){
+                if ($model->dept_head_user_id != '') {
                     $user_model = Users::model()->findByPk($model->dept_head_user_id);
                     $user_model->parent_dept_id = $model->dept_parent_id;
                     $user_model->save();
@@ -185,6 +185,23 @@ class DepartmentController extends Controller {
         $this->render('_adduser', array(
             'model' => $model,
         ));
+    }
+    
+    public function actionGetchilds() {
+        if(isset($_POST)){
+            $depts = Yii::app()->db->createCommand(
+                        "SELECT GetDeptTree(dept_id) as depts
+                    FROM app_departmets
+                    Where dept_id = '{$_POST['parent_id']}'")->queryRow();
+            $depts = explode(",", $depts['depts']);
+            array_push($depts, $_POST['parent_id']);
+
+            $dept_array = array();
+            foreach ($depts as $value) {
+                $dept_array[$value] = Department::model()->findByPk($value)->dept_name;
+            }
+            echo json_encode($dept_array);
+        }
     }
 
 }
