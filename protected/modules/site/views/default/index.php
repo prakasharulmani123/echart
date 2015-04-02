@@ -79,7 +79,7 @@ if (!isset($_GET['organization'])) {
     $arr_count = key(array_slice($arrayDepartments, -1, 1, TRUE)) + 1;
     //Generate Childs departments for the parents
     foreach ($department2 as $department) {
-        if ($department['org_parent_id'] != 0) {
+//        if ($department['org_parent_id'] != 0) {
             if (empty($unique_dept) || !in_array($department['dept_id'], $unique_dept)) {
                 $users = Users::model()->findAll('parent_dept_id = :parent_dept_id AND user_id != :user_id ', array(
                     ':parent_dept_id' => $department['dept_id'],
@@ -110,7 +110,7 @@ if (!isset($_GET['organization'])) {
                         }
                     }
                 }
-            }
+//            }
             array_push($unique_dept, $department['dept_id']);
         }
     }
@@ -180,7 +180,7 @@ function createDeptTree($array, $currentParent, $currLevel = 0, $prevLevel = -1,
             if (isset($category['assistant_name']) && !isset($_GET['organization']) /* && $organize_chart == true */) {
                 $img_path = Yii::app()->createAbsoluteUrl('uploads/user/' . $category['assistant_image']);
                 $label .= '<adjunct>' . '<span id="orgainzeImage' . $category['assistant_id'] . '"><a href="javascript:popup(' . $category['assistant_id'] . ')">';
-                $label .= "<img src='{$img_path}' class='orgainzeImage' />";
+            $label .= "<img src='{$img_path}' class='orgainzeImage' alt='{$category['assistant_name']}' />";
                 $label .= $category['assistant_name'];
                 $label .= "</a></span></adjunct>";
             }

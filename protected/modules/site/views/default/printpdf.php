@@ -97,7 +97,7 @@
                     $arr_count = key(array_slice($arrayDepartments, -1, 1, TRUE)) + 1;
                     //Generate Childs departments for the parents
                     foreach ($department2 as $department) {
-                        if ($department['org_parent_id'] != 0) {
+//                        if ($department['org_parent_id'] != 0) {
                             if (empty($unique_dept) || !in_array($department['dept_id'], $unique_dept)) {
                                 $users = Users::model()->findAll('parent_dept_id = :parent_dept_id AND user_id != :user_id ', array(
                                     ':parent_dept_id' => $department['dept_id'],
@@ -130,7 +130,7 @@
                                 }
                             }
                             array_push($unique_dept, $department['dept_id']);
-                        }
+//                        }
                     }
                 }
 

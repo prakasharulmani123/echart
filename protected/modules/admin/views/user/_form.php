@@ -261,6 +261,14 @@ $form = $this->beginWidget('CActiveForm', array(
 <?php
 $js = <<< EOD
         $(document).ready(function(){
+            if($("#Users_is_personal_staff").val() == '0'){
+                $(".personal_staff_field").show();
+                $(".parent_field").hide();
+            }else{
+                $(".personal_staff_field").hide();
+                $(".parent_field").show();
+            }
+        
             $("#Users_is_personal_staff").on("change", function(){
                 if($(this).val() == '0'){
                     $(".personal_staff_field").show();
