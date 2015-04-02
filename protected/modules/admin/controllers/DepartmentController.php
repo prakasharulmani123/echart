@@ -189,16 +189,19 @@ class DepartmentController extends Controller {
     
     public function actionGetchilds() {
         if(isset($_POST)){
-            $depts = Yii::app()->db->createCommand(
-                        "SELECT GetDeptTree(dept_id) as depts
-                    FROM app_departmets
-                    Where dept_id = '{$_POST['parent_id']}'")->queryRow();
-            $depts = explode(",", $depts['depts']);
-            array_push($depts, $_POST['parent_id']);
-
-            $dept_array = array();
-            foreach ($depts as $value) {
-                $dept_array[$value] = Department::model()->findByPk($value)->dept_name;
+            if($_POST['parent_id'] != ''){
+                $dept_array = array();
+                $depts = Yii::app()->db->createCommand(
+                            "SELECT GetDeptTree(dept_id) as depts
+                        FROM app_departmets
+                        Where dept_id = '{$_POST['parent_id']}'")->queryRow();
+                $depts = explode(",", $depts['depts']);
+                array_push($depts, $_POST['parent_id']);
+                foreach ($depts as $value) {
+                    $dept_array[$value] = Department::model()->findByPk($value)->dept_name;
+                }
+            }else{
+                $dept_array = CHtml::listData(Department::model()->isActive()->findAll(), 'dept_id', 'dept_name');
             }
             echo json_encode($dept_array);
         }
