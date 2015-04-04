@@ -68,6 +68,7 @@ foreach ($departments as $key => $department) {
                 $arrayDepartments[$key]['assistant_id'] = $assistant->user_id;
                 $arrayDepartments[$key]['assistant_name'] = $assistant->userProfile->prof_firstname;
                 $arrayDepartments[$key]['assistant_image'] = $assistant->user_prof_image;
+                $arrayDepartments[$key]['assistant_department'] = $assistant->userProfile->profDepartment->dept_name;
             }
             array_push($head_users, $department->deptHead->user_id);
         }
@@ -107,6 +108,7 @@ if (!isset($_GET['organization'])) {
                             $arrayDepartments[$arr_count]['assistant_id'] = $assistant->user_id;
                             $arrayDepartments[$arr_count]['assistant_name'] = $assistant->userProfile->prof_firstname;
                             $arrayDepartments[$arr_count]['assistant_image'] = $assistant->user_prof_image;
+                            $arrayDepartments[$arr_count]['assistant_department'] = $assistant->userProfile->profDepartment->dept_name;
                         }
                     }
                 }
@@ -180,9 +182,10 @@ function createDeptTree($array, $currentParent, $currLevel = 0, $prevLevel = -1,
             if (isset($category['assistant_name']) && !isset($_GET['organization']) /* && $organize_chart == true */) {
                 $img_path = Yii::app()->createAbsoluteUrl('uploads/user/' . $category['assistant_image']);
                 $label .= '<adjunct>' . '<span id="orgainzeImage' . $category['assistant_id'] . '"><a href="javascript:popup(' . $category['assistant_id'] . ')">';
-            $label .= "<img src='{$img_path}' class='orgainzeImage' alt='{$category['assistant_name']}' />";
+                $label .= "<img src='{$img_path}' class='orgainzeImage' alt='{$category['assistant_name']}' />";
                 $label .= $category['assistant_name'];
-                $label .= "</a></span></adjunct>";
+                $label .= "</a></span><br />";
+                $label .= "<span>{$category['assistant_department']}</span></adjunct>";
             }
 
             echo $label;
