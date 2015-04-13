@@ -4,7 +4,14 @@ $companies = CHtml::listData(Company::model()->isActive()->findAll(array('order'
 $sites = CHtml::listData(Site::model()->isActive()->findAll(array('order' => 'site_name asc')), 'site_id', 'site_name');
 $secratey = CHtml::listData(Users::model()->with('userProfile')->isActive()->isAssistnant()->findAll(array('order' => 'user_name asc')), 'user_id', 'userProfile.prof_firstname');
 $departments = CHtml::listData(Department::model()->isActive()->findAll(array('order' => 'dept_name asc')), 'dept_id', 'dept_name');
-$positions = CHtml::listData(Position::model()->isActive()->findAll(array('order' => 'position_name asc')), 'position_id', 'position_name');
+$positions = array();
+if($profModel->prof_department != ''){
+    $positions = CHtml::listData(Position::model()->isActive()->findAll(
+                            "position_dept_id = :dept_id OR position_dept_id = '0'", 
+                            array(':dept_id'=>$profModel->prof_department),
+                            array('order' => 'position_name ASC')),
+                        'position_id', 'position_name');
+}
 
 $GLOBALS['assist'] = UserProfile::getAssitants();
 
