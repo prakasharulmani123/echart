@@ -101,6 +101,24 @@
             <div class="columns clearfix">
                 <div class="col_50 no_border_top">
                     <div class="section">
+                        <p><?php echo UserProfile::model()->getAttributeLabel('prof_sites'); ?></p>
+                    </div>
+                </div>
+                <div class="col_50 no_border_top no_border_right">
+                    <div class="section">
+                                                <?php
+                        $site_list = explode(",", $model->userProfile->prof_sites);
+                        foreach ($site_list as $value) {
+                            echo "<p>".Site::model()->findByPk($value)->site_name."</p>";
+                        }
+                        ?>
+
+                    </div>
+                </div>
+            </div>
+            <div class="columns clearfix">
+                <div class="col_50 no_border_top">
+                    <div class="section">
                         <p><?php echo UserProfile::model()->getAttributeLabel('prof_phone'); ?></p>
                     </div>
                 </div>
@@ -149,36 +167,12 @@
             <div class="columns clearfix">
                 <div class="col_50 no_border_top">
                     <div class="section">
-                        <p><?php echo UserProfile::model()->getAttributeLabel('prof_site'); ?></p>
-                    </div>
-                </div>
-                <div class="col_50 no_border_top no_border_right">
-                    <div class="section">
-                        <p><?php echo $model->userProfile->profSite->site_name ?></p>
-                    </div>
-                </div>
-            </div>
-            <div class="columns clearfix">
-                <div class="col_50 no_border_top">
-                    <div class="section">
                         <p><?php echo UserProfile::model()->getAttributeLabel('prof_sheet_position'); ?></p>
                     </div>
                 </div>
                 <div class="col_50 no_border_top no_border_right">
                     <div class="section">
                         <p><?php echo CHtml::link($model->userProfile->prof_sheet_position, Yii::app()->createAbsoluteUrl('uploads/user/'.$model->userProfile->prof_sheet_position)); ?></p>
-                    </div>
-                </div>
-            </div>
-            <div class="columns clearfix">
-                <div class="col_50 no_border_top">
-                    <div class="section">
-                        <p><?php echo UserProfile::model()->getAttributeLabel('prof_site_2'); ?></p>
-                    </div>
-                </div>
-                <div class="col_50 no_border_top no_border_right">
-                    <div class="section">
-                        <p><?php echo $model->userProfile->profSite2->site_name ?></p>
                     </div>
                 </div>
             </div>

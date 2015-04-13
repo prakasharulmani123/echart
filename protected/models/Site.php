@@ -44,6 +44,7 @@ class Site extends CActiveRecord {
         return array(
             array('site_name, reception_mail, reception_phone', 'required'),
             array('reception_mail', 'email'),
+            array('site_name', 'unique'),
             array('site_name', 'length', 'max' => 150),
             array('reception_mail', 'length', 'max' => 100),
             array('reception_phone, parking_phone, tel_security', 'length', 'max' => 50),

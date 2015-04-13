@@ -96,7 +96,14 @@ class SiteController extends Controller {
      * @param integer $id the ID of the model to be deleted
      */
     public function actionDelete($id) {
-        $this->loadModel($id)->delete();
+        $site_model = $this->loadModel($id);
+        $user_count = UserProfile::model()->count("prof_site = :id OR prof_site_2 = :id", array(':id' => $id));
+        if($user_count > 0){
+            Yii::app()->user->setFlash('red', "This site have {$user_count} Users. Can't delete this site");
+            $this->redirect(array("site/index"));
+        }
+        
+        $site_model->delete();
 
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
         if (!isset($_GET['ajax'])) {

@@ -184,6 +184,7 @@ class DepartmentController extends Controller {
 
         $this->render('_adduser', array(
             'model' => $model,
+            'id' => $id
         ));
     }
     

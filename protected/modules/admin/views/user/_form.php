@@ -2,7 +2,7 @@
 $users = CHtml::listData(Users::model()->with('userProfile')->isActive()->isNotAssistnant()->findAll(), 'user_id', 'userProfile.prof_firstname');
 $companies = CHtml::listData(Company::model()->isActive()->findAll(array('order' => 'company_name asc')), 'company_id', 'company_name');
 $sites = CHtml::listData(Site::model()->isActive()->findAll(array('order' => 'site_name asc')), 'site_id', 'site_name');
-$secratey = CHtml::listData(Users::model()->isActive()->isAssistnant()->findAll(array('order' => 'user_name asc')), 'user_id', 'user_name');
+$secratey = CHtml::listData(Users::model()->with('userProfile')->isActive()->isAssistnant()->findAll(array('order' => 'user_name asc')), 'user_id', 'userProfile.prof_firstname');
 $departments = CHtml::listData(Department::model()->isActive()->findAll(array('order' => 'dept_name asc')), 'dept_id', 'dept_name');
 $positions = CHtml::listData(Position::model()->isActive()->findAll(array('order' => 'position_name asc')), 'position_id', 'position_name');
 
@@ -111,17 +111,17 @@ $form = $this->beginWidget('CActiveForm', array(
             </div>
         </fieldset>
         <fieldset class="label_side top">
-            <?php echo $form->labelEx($profModel, 'prof_position'); ?>
-            <div class="clearfix">
-                <?php echo $form->dropDownList($profModel, 'prof_position', $positions, array('class' => 'uniform', 'prompt' => '')); ?>
-                <?php echo $form->error($profModel, 'prof_position'); ?>
-            </div>
-        </fieldset>
-        <fieldset class="label_side top">
             <?php echo $form->labelEx($profModel, 'prof_department'); ?>
             <div class="clearfix">
                 <?php echo $form->dropDownList($profModel, 'prof_department', $departments, array('class' => 'uniform', 'prompt' => '')); ?>
                 <?php echo $form->error($profModel, 'prof_department'); ?>
+            </div>
+        </fieldset>
+        <fieldset class="label_side top">
+            <?php echo $form->labelEx($profModel, 'prof_position'); ?>
+            <div class="clearfix">
+                <?php echo $form->dropDownList($profModel, 'prof_position', $positions, array('class' => 'uniform', 'prompt' => '')); ?>
+                <?php echo $form->error($profModel, 'prof_position'); ?>
             </div>
         </fieldset>
         <fieldset class="label_side top personal_staff_field">
@@ -162,16 +162,30 @@ $form = $this->beginWidget('CActiveForm', array(
     </div>
     <div class="col_50">
 
-
-
-
         <fieldset class="label_side top">
+            <?php echo $form->labelEx($profModel, 'prof_sites'); ?>
+            <div class="clearfix">
+                <?php 
+                $selected = array();
+                if($profModel->prof_sites != ''){
+                    $site_list = explode(",", $profModel->prof_sites);
+                    
+                    foreach ($site_list as $value) {
+                        $selected[$value] = array('selected' => 'selected');
+                    }
+                }
+                ?>
+                <?php echo $form->dropDownList($profModel, 'prof_sites', $sites, array('class' => '', 'prompt' => '', 'multiple' => true, 'options' => $selected)); ?>
+                <?php echo $form->error($profModel, 'prof_sites'); ?>
+            </div>
+        </fieldset>
+<!--        <fieldset class="label_side top">
             <?php echo $form->labelEx($profModel, 'prof_site'); ?>
             <div class="clearfix">
                 <?php echo $form->dropDownList($profModel, 'prof_site', $sites, array('class' => 'uniform', 'prompt' => '')); ?>
                 <?php echo $form->error($profModel, 'prof_site'); ?>
             </div>
-        </fieldset>
+        </fieldset>-->
         <fieldset class="label_side top">
             <?php echo $form->labelEx($profModel, 'prof_sheet_position'); ?>
             <div class="clearfix">
@@ -179,13 +193,13 @@ $form = $this->beginWidget('CActiveForm', array(
                 <?php echo $form->error($profModel, 'prof_sheet_position'); ?>
             </div>
         </fieldset>
-        <fieldset class="label_side top">
+<!--        <fieldset class="label_side top">
             <?php echo $form->labelEx($profModel, 'prof_site_2'); ?>
             <div class="clearfix">
                 <?php echo $form->dropDownList($profModel, 'prof_site_2', $sites, array('class' => 'uniform', 'prompt' => '')); ?>
                 <?php echo $form->error($profModel, 'prof_site_2'); ?>
             </div>
-        </fieldset>
+        </fieldset>-->
         <fieldset class="label_side top">
             <?php echo $form->labelEx($profModel, 'prof_phone_2'); ?>
             <div class="clearfix">
@@ -260,6 +274,7 @@ $form = $this->beginWidget('CActiveForm', array(
 
 <?php
 $url = Yii::app()->baseUrl.'/admin/department/getchilds';
+$positionurl = Yii::app()->baseUrl.'/admin/position/getpositions';
 $js = <<< EOD
         $(document).ready(function(){
             if($("#Users_is_personal_staff").val() == '0'){
@@ -294,9 +309,24 @@ $js = <<< EOD
                         });
                         $('#UserProfile_prof_department').val(_that.val());
                         $.uniform.update("#UserProfile_prof_department");
-
-//                        $('#UserProfile_prof_department').empty();
-//                        $('#UserProfile_prof_department').val("");
+                    }
+                });
+            });
+        
+            $("#UserProfile_prof_department").on("change", function(){
+                var _that = $(this);
+                 $.ajax({
+                    type: "POST",
+                    data: {dept_id: _that.val()},
+                    url: "$positionurl", 
+                    success: function(result){
+                        $('#UserProfile_prof_position').find('option:not(:first)').remove();
+                        var obj = jQuery.parseJSON(result);
+                        $.each(obj, function(key,value) {
+                            $('#UserProfile_prof_position').append('<option value="'+key+'">'+value+'</option>');
+                        });
+                        $('#UserProfile_prof_position').val("");
+                        $.uniform.update("#UserProfile_prof_position");
                     }
                 });
             });

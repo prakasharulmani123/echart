@@ -29,6 +29,7 @@ class Department extends CActiveRecord {
         // will receive user inputs.
         return array(
             array('dept_name', 'required'),
+            array('dept_name', 'unique'),
             array('dept_name', 'length', 'max' => 150),
             array('dept_parent_id, dept_head_user_id', 'length', 'max' => 20),
             array('status', 'length', 'max' => 1),

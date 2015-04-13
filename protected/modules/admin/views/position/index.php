@@ -10,6 +10,7 @@
                 <tr>
                     <th>#</th>
                     <th>Position Name</th>
+                    <th>Department</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
@@ -19,6 +20,7 @@
                     <tr>
                         <td align="center"><?php echo $key + 1; ?></td>
                         <td align="center"><?php echo $position->position_name ?></td>
+                        <td align="center"><?php echo isset($position->posDept) ? $position->posDept->dept_name : '' ?></td>
                         <td align="center"><?php echo $position->position_status == '1' ? 'Active' : 'Inactive' ?></td>
                         <td align="center">
                             <?php

@@ -81,37 +81,37 @@ if (!isset($_GET['organization'])) {
     //Generate Childs departments for the parents
     foreach ($department2 as $department) {
 //        if ($department['org_parent_id'] != 0) {
-            if (empty($unique_dept) || !in_array($department['dept_id'], $unique_dept)) {
-                $users = Users::model()->findAll('parent_dept_id = :parent_dept_id AND user_id != :user_id ', array(
-                    ':parent_dept_id' => $department['dept_id'],
-                    ':user_id' => $department['user_id'] != 0 ? $department['user_id'] : '',
-                ));
+        if (empty($unique_dept) || !in_array($department['dept_id'], $unique_dept)) {
+            $users = Users::model()->findAll('parent_dept_id = :parent_dept_id AND user_id != :user_id ', array(
+                ':parent_dept_id' => $department['dept_id'],
+                ':user_id' => $department['user_id'] != 0 ? $department['user_id'] : '',
+            ));
 
-                foreach ($users as $key => $user) {
-                    if (!in_array($user->user_id, $head_users)) {
-                        $parentkey = array_search($department['dept_name'], $deptKeys);
-                        $arr_count++;
-                        $arrayDepartments[$arr_count] = array(
-                            'org_parent_id' => $department['org_parent_id'],
-                            'parent_id' => $parentkey,
-                            'dept_id' => $user->userProfile->profDepartment->dept_id,
-                            'dept_name' => $user->userProfile->profDepartment->dept_name,
-                            'user_name' => $user->userProfile->prof_firstname,
-                            'user_id' => $user->user_id,
-                            'user_image' => $user->user_prof_image,
-                            'user_phone' => $user->userProfile->prof_mobile,
-                            'user_email' => $user->user_email,
-                            'position_id' => $user->userProfile->prof_position,
-                        );
-                        if (isset($user->userProfile->profPersonalStaff)) {
-                            $assistant = $user->userProfile->profPersonalStaff;
-                            $arrayDepartments[$arr_count]['assistant_id'] = $assistant->user_id;
-                            $arrayDepartments[$arr_count]['assistant_name'] = $assistant->userProfile->prof_firstname;
-                            $arrayDepartments[$arr_count]['assistant_image'] = $assistant->user_prof_image;
-                            $arrayDepartments[$arr_count]['assistant_department'] = $assistant->userProfile->profDepartment->dept_name;
-                        }
+            foreach ($users as $key => $user) {
+                if (!in_array($user->user_id, $head_users)) {
+                    $parentkey = array_search($department['dept_name'], $deptKeys);
+                    $arr_count++;
+                    $arrayDepartments[$arr_count] = array(
+                        'org_parent_id' => $department['org_parent_id'],
+                        'parent_id' => $parentkey,
+                        'dept_id' => $user->userProfile->profDepartment->dept_id,
+                        'dept_name' => $user->userProfile->profDepartment->dept_name,
+                        'user_name' => $user->userProfile->prof_firstname,
+                        'user_id' => $user->user_id,
+                        'user_image' => $user->user_prof_image,
+                        'user_phone' => $user->userProfile->prof_mobile,
+                        'user_email' => $user->user_email,
+                        'position_id' => $user->userProfile->prof_position,
+                    );
+                    if (isset($user->userProfile->profPersonalStaff)) {
+                        $assistant = $user->userProfile->profPersonalStaff;
+                        $arrayDepartments[$arr_count]['assistant_id'] = $assistant->user_id;
+                        $arrayDepartments[$arr_count]['assistant_name'] = $assistant->userProfile->prof_firstname;
+                        $arrayDepartments[$arr_count]['assistant_image'] = $assistant->user_prof_image;
+                        $arrayDepartments[$arr_count]['assistant_department'] = $assistant->userProfile->profDepartment->dept_name;
                     }
                 }
+            }
 //            }
             array_push($unique_dept, $department['dept_id']);
         }
@@ -120,9 +120,9 @@ if (!isset($_GET['organization'])) {
 
 //Manager Filters
 $managers_list = Position::model()->managersList();
-if($_GET['manager']){
+if ($_GET['manager']) {
     foreach ($arrayDepartments as $key => $arrayDepartment) {
-        if(!in_array($arrayDepartment['position_id'], $managers_list)){
+        if (!in_array($arrayDepartment['position_id'], $managers_list)) {
             unset($arrayDepartments[$key]);
         }
     }
@@ -286,9 +286,15 @@ foreach ($users as $key => $user) {
                                 </fieldset>
 
                                 <fieldset class="label_side">
-                                    <label><?= Users::model()->getAttributeLabel('prof_site') ?></label>
+                                    <label><?= UserProfile::model()->getAttributeLabel('prof_sites') ?></label>
                                     <div class="clearfix">
-                                        <p><?= $user->userProfile->profSite->site_name ?></p>
+                                        <?php
+                                        $site_list = explode(",", $user->userProfile->prof_sites);
+                                        foreach ($site_list as $value) {
+                                            echo "<p>" . Site::model()->findByPk($value)->site_name . "</p>";
+                                        }
+                                        ?>
+
                                     </div>
                                 </fieldset>
 
@@ -298,14 +304,6 @@ foreach ($users as $key => $user) {
                                         <p><?= $user->userProfile->prof_phone_2 ?></p>
                                     </div>
                                 </fieldset>
-
-                                <fieldset class="label_side">
-                                    <label><?= Users::model()->getAttributeLabel('prof_site_2') ?></label>
-                                    <div class="clearfix">
-                                        <p><?= $user->userProfile->profSite2->site_name ?></p>
-                                    </div>
-                                </fieldset>
-
 
                             </div>
                         </div>
@@ -337,7 +335,7 @@ foreach ($users as $key => $user) {
                                 </fieldset>
 
                                 <fieldset class="label_side">
-                                    <label><?= Users::model()->getAttributeLabel('prof_code_site') ?></label>
+                                    <label><?= UserProfile::model()->getAttributeLabel('prof_code_site') ?></label>
                                     <div class="clearfix">
                                         <p><?= $user->userProfile->profCodeSite->site_name ?></p>
                                     </div>
@@ -350,14 +348,6 @@ foreach ($users as $key => $user) {
                                     </div>
                                 </fieldset>
 
-                                <fieldset class="label_side">
-                                    <label><?= Users::model()->getAttributeLabel('prof_site_2') ?></label>
-                                    <div class="clearfix">
-                                        <p><?= $user->userProfile->profSite2->site_name ?></p>
-                                    </div>
-                                </fieldset>
-
-
                             </div>
                         </div>
 
@@ -365,63 +355,47 @@ foreach ($users as $key => $user) {
                     <div id="tabs-3" class="block">
 
                         <div class="columns clearfix">
-                            <div class="col_100">
-                                <fieldset class="label_side top">
-                                    <label><?= UserProfile::model()->getAttributeLabel('prof_site') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->site_name ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('reception_mail') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->reception_mail ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('reception_phone') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->reception_phone ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('parking_phone') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->parking_phone ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('tel_security') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->tel_security ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('address') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->address ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('restaurant') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->restaurant ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('information') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->information ?></p>
-                                    </div>
-                                </fieldset>
-
+                            <div class="col_100" style="max-height: 450px; overflow-y: scroll">
+                                <?php
+                                $i = 1;
+                                foreach ($site_list as $value) {
+                                    $site = Site::model()->findByPk($value);?>
+                                    <fieldset class="label_side top">
+                                        <label><?= "Site ".$i++ ?></label>
+                                        <div>
+                                            <p><?= $site->site_name ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('reception_mail') ?></label>
+                                        <div>
+                                            <p><?= $site->reception_mail ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('reception_phone') ?></label>
+                                        <div>
+                                            <p><?= $site->reception_phone ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('parking_phone') ?></label>
+                                        <div>
+                                            <p><?= $site->parking_phone ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('tel_security') ?></label>
+                                        <div>
+                                            <p><?= $site->tel_security ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('address') ?></label>
+                                        <div>
+                                            <p><?= $site->address ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('restaurant') ?></label>
+                                        <div>
+                                            <p><?= $site->restaurant ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('information') ?></label>
+                                        <div>
+                                            <p><?= $site->information ?></p>
+                                        </div>
+                                    </fieldset>
+                                <?php }?>
+                                
                             </div>
                         </div>
 

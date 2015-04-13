@@ -25,7 +25,7 @@ class PositionController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('index', 'create', 'update', 'delete'),
+                'actions' => array('index', 'create', 'update', 'delete', 'getpositions'),
                 'users' => array('@'),
             ),
             array('deny', // deny all users
@@ -97,7 +97,14 @@ class PositionController extends Controller {
      * @param integer $id the ID of the model to be deleted
      */
     public function actionDelete($id) {
-        $this->loadModel($id)->delete();
+        $position_model = $this->loadModel($id);
+        $user_count = UserProfile::model()->count("prof_position = :id", array(':id' => $id));
+        
+        if($user_count > 0){
+            Yii::app()->user->setFlash('red', "This position have {$user_count} Users. Can't delete this position");
+            $this->redirect(array("position/index"));
+        }
+        $position_model->delete();
 
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
         if (!isset($_GET['ajax'])) {
@@ -139,6 +146,20 @@ class PositionController extends Controller {
         if (isset($_POST['ajax']) && $_POST['ajax'] === 'position-form') {
             echo CActiveForm::validate($model);
             Yii::app()->end();
+        }
+    }
+    
+    public function actionGetpositions() {
+        if(isset($_POST)){
+            $pos_array = array();
+            if($_POST['dept_id'] != ''){
+                $pos_array = CHtml::listData(Position::model()->isActive()->findAll(
+                            "position_dept_id = :dept_id OR position_dept_id = '0'", 
+                            array(':dept_id'=>$_POST['dept_id']),
+                            array('order' => 'position_name ASC')),
+                        'position_id', 'position_name');
+            }
+            echo json_encode($pos_array);
         }
     }
 

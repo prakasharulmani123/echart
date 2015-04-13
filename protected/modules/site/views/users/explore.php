@@ -113,8 +113,7 @@ EOD;
                         <div class="columns clearfix">
                             <div class="col_25">
                                 <div class="section">
-                                    <?=
-                                    CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), $user->user_name, array('width' => '55'))
+                                    <?= CHtml::image(Yii::app()->createAbsoluteUrl('uploads/user/' . $user->user_prof_image), $user->user_name, array('width' => '55'))
                                     ?>
                                 </div>
                             </div>
@@ -157,9 +156,15 @@ EOD;
                                 </fieldset>
 
                                 <fieldset class="label_side">
-                                    <label><?= Users::model()->getAttributeLabel('prof_site') ?></label>
+                                    <label><?= UserProfile::model()->getAttributeLabel('prof_sites') ?></label>
                                     <div class="clearfix">
-                                        <p><?= $user->userProfile->profSite->site_name ?></p>
+                                        <?php
+                                        $site_list = explode(",", $user->userProfile->prof_sites);
+                                        foreach ($site_list as $value) {
+                                            echo "<p>" . Site::model()->findByPk($value)->site_name . "</p>";
+                                        }
+                                        ?>
+
                                     </div>
                                 </fieldset>
 
@@ -169,14 +174,6 @@ EOD;
                                         <p><?= $user->userProfile->prof_phone_2 ?></p>
                                     </div>
                                 </fieldset>
-
-                                <fieldset class="label_side">
-                                    <label><?= Users::model()->getAttributeLabel('prof_site_2') ?></label>
-                                    <div class="clearfix">
-                                        <p><?= $user->userProfile->profSite2->site_name ?></p>
-                                    </div>
-                                </fieldset>
-
 
                             </div>
                         </div>
@@ -208,7 +205,7 @@ EOD;
                                 </fieldset>
 
                                 <fieldset class="label_side">
-                                    <label><?= Users::model()->getAttributeLabel('prof_code_site') ?></label>
+                                    <label><?= UserProfile::model()->getAttributeLabel('prof_code_site') ?></label>
                                     <div class="clearfix">
                                         <p><?= $user->userProfile->profCodeSite->site_name ?></p>
                                     </div>
@@ -221,14 +218,6 @@ EOD;
                                     </div>
                                 </fieldset>
 
-                                <fieldset class="label_side">
-                                    <label><?= Users::model()->getAttributeLabel('prof_site_2') ?></label>
-                                    <div class="clearfix">
-                                        <p><?= $user->userProfile->profSite2->site_name ?></p>
-                                    </div>
-                                </fieldset>
-
-
                             </div>
                         </div>
 
@@ -236,63 +225,47 @@ EOD;
                     <div id="tabs-3" class="block">
 
                         <div class="columns clearfix">
-                            <div class="col_100">
-                                <fieldset class="label_side top">
-                                    <label><?= UserProfile::model()->getAttributeLabel('prof_site') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->site_name ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('reception_mail') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->reception_mail ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('reception_phone') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->reception_phone ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('parking_phone') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->parking_phone ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('tel_security') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->tel_security ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('address') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->address ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('restaurant') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->restaurant ?></p>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="label_side top">
-                                    <label><?= Site::model()->getAttributeLabel('information') ?></label>
-                                    <div>
-                                        <p><?= $user->userProfile->profSite->information ?></p>
-                                    </div>
-                                </fieldset>
-
+                            <div class="col_100" style="max-height: 450px; overflow-y: scroll">
+                                <?php
+                                $i = 1;
+                                foreach ($site_list as $value) {
+                                    $site = Site::model()->findByPk($value);?>
+                                    <fieldset class="label_side top">
+                                        <label><?= "Site ".$i++ ?></label>
+                                        <div>
+                                            <p><?= $site->site_name ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('reception_mail') ?></label>
+                                        <div>
+                                            <p><?= $site->reception_mail ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('reception_phone') ?></label>
+                                        <div>
+                                            <p><?= $site->reception_phone ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('parking_phone') ?></label>
+                                        <div>
+                                            <p><?= $site->parking_phone ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('tel_security') ?></label>
+                                        <div>
+                                            <p><?= $site->tel_security ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('address') ?></label>
+                                        <div>
+                                            <p><?= $site->address ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('restaurant') ?></label>
+                                        <div>
+                                            <p><?= $site->restaurant ?></p>
+                                        </div>
+                                        <label><?= UserProfile::model()->getAttributeLabel('information') ?></label>
+                                        <div>
+                                            <p><?= $site->information ?></p>
+                                        </div>
+                                    </fieldset>
+                                <?php }?>
+                                
                             </div>
                         </div>
 

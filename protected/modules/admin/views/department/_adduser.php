@@ -1,6 +1,6 @@
 <?php
-$users = CHtml::listData(Users::model()->with('userProfile')->isActive()->isNotAssistnant()->findAll(array('order' => 'userProfile.prof_firstname ASC')), 'user_id', 'userProfile.prof_firstname');
-
+$user_find = Users::model()->with('userProfile')->isActive()->isNotAssistnant()->findAll('userProfile.prof_department = :dept', array(':dept' => $id), array('order' => 'userProfile.prof_name ASC'));
+$users = CHtml::listData($user_find, 'user_id', 'userProfile.prof_firstname');
 $form = $this->beginWidget('CActiveForm', array(
     'id' => 'Department-form',
     'enableAjaxValidation' => false,

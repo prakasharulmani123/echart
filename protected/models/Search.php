@@ -162,7 +162,7 @@ class Search extends CActiveRecord {
         $criteria->compare('userProfile.prof_mobile', $this->mobile, true);
         $criteria->compare('userProfile.prof_fax', $this->fax, true);
         $criteria->compare('userProfile.prof_office', $this->office, true);
-        $criteria->compare('userProfile.prof_site', $this->site, true);
+//        $criteria->compare('userProfile.prof_site', $this->site, true);
         $criteria->compare('userProfile.prof_company', $this->company, true);
         
 //        $search_conditon = "userProfile.prof_firstname = '" . $this->name . "'  "

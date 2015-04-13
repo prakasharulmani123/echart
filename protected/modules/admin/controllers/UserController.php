@@ -101,7 +101,9 @@ class UserController extends Controller {
         if (isset($_POST['Users'])) {
             $check_is_head = Department::model()->find('dept_head_user_id = :user_id', array(':user_id' => $model->user_id));
             if (!empty($check_is_head)) {
-                if ($_POST['Users']['parent_dept_id'] != '' && $model->parent_dept_id != $_POST['Users']['parent_dept_id']) {
+                $cond = ($_POST['Users']['parent_dept_id'] != '' && $model->parent_dept_id != $_POST['Users']['parent_dept_id'])
+                    || ($_POST['UserProfile']['prof_department'] != '' && $check_is_head->dept_id != $_POST['UserProfile']['prof_department']);
+                if ($cond) {
                     $message = "You can't change Head User. Please remove the user from Department Head<br />";
                     $link = CHtml::link('link', array('/admin/department/adduser/id/' . $check_is_head->dept_id));
                     $message .= "Click Here this {$link} to remove this user from Head department<br />";
@@ -115,7 +117,9 @@ class UserController extends Controller {
             if($_POST['Users']['is_personal_staff'] == '1'){
                 $model->setAttribute('parent_dept_id', 0);
             }
+            
             $profModel->attributes = $_POST['UserProfile'];
+            $profModel->prof_sites = implode(",", $profModel->prof_sites);
             $valid = $model->validate();
             $valid = $profModel->validate() && $valid;
 

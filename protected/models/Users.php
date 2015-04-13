@@ -26,7 +26,7 @@ class Users extends CActiveRecord {
     public $confirm_password;
     public $_photo;
     public $print;
-
+    
     /**
      * @return string the associated database table name
      */
@@ -57,6 +57,12 @@ class Users extends CActiveRecord {
             array('user_email, user_password, user_activation_key, user_login_ip', 'length', 'max' => 250),
             array('user_name, user_email', 'required', 'on' => 'update'),
             array('user_email', 'unique', 'message' => "user email already exists"),
+            array('user_name', 'unique', 'message' => "user name already exists"),
+            array(
+                'user_name',
+                'match', 'pattern' => '/^[\-_a-z0-9]{6,14}$/',
+                'message' => 'Username should be lowercase characters, numbers(0-9), underscore(_) and hyphen(-). Minimum 6 characters and Maximum 14 characters allowed',
+            ),
             array('user_email', 'email'),
             array('user_status, is_personal_staff', 'length', 'max' => 1),
             array('user_last_login, created, modified', 'safe'),

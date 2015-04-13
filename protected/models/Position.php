@@ -35,11 +35,13 @@ class Position extends CActiveRecord {
         // will receive user inputs.
         return array(
             array('position_name', 'required'),
+            array('position_name', 'unique'),
             array('position_name', 'length', 'max' => 150),
+            array('position_dept_id', 'length', 'max' => 20),
             array('position_status', 'length', 'max' => 1),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('position_id, position_name, position_status', 'safe', 'on' => 'search'),
+            array('position_id, position_name, position_status, position_dept_id', 'safe', 'on' => 'search'),
         );
     }
 
@@ -51,6 +53,7 @@ class Position extends CActiveRecord {
         // class name for the relations automatically generated below.
         return array(
             'userProfiles' => array(self::HAS_MANY, 'UserProfile', 'prof_position'),
+            'posDept' => array(self::BELONGS_TO, 'Department', 'position_dept_id'),
         );
     }
 
@@ -62,6 +65,7 @@ class Position extends CActiveRecord {
             'position_id' => 'Position',
             'position_name' => 'Postion Name',
             'position_status' => 'Status',
+            'dept_id' => 'Department',
         );
     }
 

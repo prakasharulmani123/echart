@@ -54,14 +54,15 @@ class UserProfile extends CActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('prof_firstname, prof_position, prof_department, prof_mobile, prof_site, prof_company', 'required'),
+            array('prof_firstname, prof_position, prof_department, prof_mobile, prof_company, prof_sites', 'required'),
             array('user_id, prof_position, prof_department, prof_personal_staff, prof_site, prof_site_2, prof_department_2, prof_company, prof_code_site', 'length', 'max' => 20),
             array('prof_firstname, prof_lastname, prof_phone_2, prof_hierarchy', 'length', 'max' => 100),
             array('prof_phone, prof_mobile, prof_fax, prof_office, prof_structure_code', 'length', 'max' => 50),
             array('prof_sheet_position, prof_sheet_structrure', 'length', 'max' => 255),
+            array('prof_sites', 'length', 'max' => 500),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('prof_id, user_id, prof_firstname, prof_lastname, prof_position, prof_department, prof_personal_staff, prof_phone, prof_mobile, prof_fax, prof_office, prof_site, prof_sheet_position, prof_site_2, prof_phone_2, prof_structure_code, prof_department_2, prof_company, prof_hierarchy, prof_code_site, prof_sheet_structrure', 'safe', 'on' => 'search'),
+            array('prof_id, user_id, prof_firstname, prof_lastname, prof_position, prof_department, prof_personal_staff, prof_phone, prof_mobile, prof_fax, prof_office, prof_site, prof_sheet_position, prof_site_2, prof_phone_2, prof_structure_code, prof_department_2, prof_company, prof_hierarchy, prof_code_site, prof_sheet_structrure, prof_sites', 'safe', 'on' => 'search'),
         );
     }
 
@@ -109,6 +110,7 @@ class UserProfile extends CActiveRecord {
             'prof_hierarchy' => 'Hierarchy',
             'prof_code_site' => 'Code Site',
             'prof_sheet_structrure' => 'Sheet Structrure',
+            'prof_sites' => 'Site',
         );
     }
 

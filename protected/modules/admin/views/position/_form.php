@@ -7,6 +7,14 @@ $form = $this->beginWidget('CActiveForm', array(
 <div class="columns clearfix">
     <div class="col_100">
         <fieldset class="label_side top">
+            <?php echo $form->labelEx($model, 'position_dept_id'); ?>
+            <div class="clearfix ml-11 send_left">
+                <?php $departments = CHtml::listData(Department::model()->isActive()->findAll(), 'dept_id', 'dept_name')?>
+                <?php echo $form->dropDownList($model, 'position_dept_id', $departments, array('class' => 'uniform', 'prompt' => '')); ?>
+                <?php echo $form->error($model, 'position_dept_id'); ?>
+            </div>
+        </fieldset>
+        <fieldset class="label_side top">
             <?php echo $form->labelEx($model, 'position_name'); ?>
             <div class="clearfix">
                 <?php echo $form->textField($model, 'position_name', array('size' => 60, 'maxlength' => 150)); ?>

@@ -5,6 +5,18 @@
             <div class="columns clearfix">
                 <div class="col_50 no_border_top">
                     <div class="section">
+                        <p><?php echo $model->getAttributeLabel('dept_parent_id'); ?></p>
+                    </div>
+                </div>
+                <div class="col_50 no_border_top no_border_right">
+                    <div class="section">
+                        <p><?php echo isset($model->deptParent) ?  $model->deptParent->dept_name : ''?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="columns clearfix">
+                <div class="col_50 no_border_top">
+                    <div class="section">
                         <p><?php echo $model->getAttributeLabel('dept_name'); ?></p>
                     </div>
                 </div>
