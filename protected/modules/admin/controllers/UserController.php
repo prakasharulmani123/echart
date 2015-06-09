@@ -145,14 +145,13 @@ class UserController extends Controller {
     public function actionDelete($id) {
         $user = $this->loadModel($id);
         $check_is_head = Department::model()->find('dept_head_user_id = :user_id', array(':user_id' => $user->user_id));
-        if (array($check_is_head)) {
+        if (!empty($check_is_head)) {
             $message = "You can't delete Head User. Please remove the user from Department Head<br />";
             $link = CHtml::link('link', array('/admin/department/adduser/id/' . $check_is_head->dept_id));
             $message .= "Click Here this {$link} to remove this user from Head department<br />";
             Yii::app()->user->setFlash('red', $message);
             $this->redirect(array("user/index"));
         }
-        exit;
         if (empty($user))
             throw new CHttpException(404, 'The requested page does not exist.');
 
