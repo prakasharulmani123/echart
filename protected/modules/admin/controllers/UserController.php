@@ -61,6 +61,9 @@ class UserController extends Controller {
             }
             $profModel->attributes = $_POST['UserProfile'];
 
+            if(is_array($profModel->prof_sites))
+                $profModel->prof_sites = implode (',', $profModel->prof_sites);
+            
             $valid = $model->validate();
             $valid = $profModel->validate() && $valid;
             if ($valid):

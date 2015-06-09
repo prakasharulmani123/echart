@@ -17,6 +17,7 @@ $dept_tree = Yii::app()->db->createCommand(
                 "SELECT dept_id, dept_name, dept_head_user_id, GetDeptTree(dept_id) as tree
                 FROM app_departmets
                 HAVING GetDeptTree(dept_id) != ''")->queryAll();
+
 $dept_count = array();
 foreach ($dept_tree as $key => $tree) {
     $trees = explode(',', $tree['tree']);
@@ -35,7 +36,6 @@ foreach ($departments as $key => $department) {
         $deptKeys[$department->dept_id] = $department->dept_name;
     }
 }
-
 
 $unique_dept = $head_users = array();
 $show_dept_without_users = false;
